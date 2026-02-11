@@ -187,6 +187,17 @@
             font-size: 14px;
         }
         
+        /* 加载指示器 */
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ff69b4;
+            font-size: 16px;
+            z-index: 5;
+        }
+        
         /* 底部说明 */
         .footer {
             position: absolute;
@@ -256,7 +267,7 @@
 </head>
 <body>
     <div class="container">
-        <!-- 主图片 -->
+        <!-- 主图片 - 已修改为相对路径 -->
         <img src="picture/MainPic.jpeg" alt="纪念图片" class="main-image" id="mainImage">
         
         <!-- 标题 -->
@@ -264,6 +275,9 @@
             <h1>💕 我们的纪念时刻 💕</h1>
             <p>每一个瞬间都值得珍藏</p>
         </div>
+        
+        <!-- 加载指示器 -->
+        <div class="loading" id="loadingIndicator">正在加载爱的回忆...</div>
         
         <!-- 文本框容器 -->
         <div class="text-boxes-container" id="textContainer">
@@ -290,16 +304,41 @@
     </div>
 
     <script>
-        // 模拟JSON数据 - 在实际使用中，您需要创建一个data.json文件
-        const textData = [
-            {
-                "id": 1,
-                "content": "## 第一次相遇\n\n还记得那天阳光正好，你的笑容如春风般温暖。\n\n> 命运让我们相遇，是生命中最美的安排"
-            },
-            {
-                "id": 2,
-                "content": "## 最难忘的约会\n\n- 星空下的漫步\n- 共享的冰淇淋\n- 你的手心的温度\n\n**那一刻，时间仿佛静止了**"
-            },
-            {
-                "id": 3,
-                "content": "## 你的小习惯\n\n1. 早晨的第一杯温水\n2. 思考时咬笔头\n3. 开心时眼睛会眯成月牙\n\n
+        // 全局变量
+        let textData = [];
+        let textBoxes = [];
+        let animationId = null;
+        let isRotating = true;
+        let rotationAngle = 0;
+        const radius = 150; // 旋转半径
+        const rotationSpeed = 0.002; // 旋转速度
+        
+        // 加载JSON数据
+        async function loadTextData() {
+            try {
+                const response = await fetch('data.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                textData = await response.json();
+                console.log('成功加载数据:', textData);
+                return true;
+            } catch (error) {
+                console.error('加载JSON数据失败:', error);
+                // 如果加载失败，使用内置的默认数据
+                textData = [
+                    {
+                        "id": 1,
+                        "content": "## 第一次相遇\n\n还记得那天阳光正好，你的笑容如春风般温暖。\n\n> 命运让我们相遇，是生命中最美的安排"
+                    },
+                    {
+                        "id": 2,
+                        "content": "## 最难忘的约会\n\n- 星空下的漫步\n- 共享的冰淇淋\n- 你的手心的温度\n\n**那一刻，时间仿佛静止了**"
+                    },
+                    {
+                        "id": 3,
+                        "content": "## 你的小习惯\n\n1. 早晨的第一杯温水\n2. 思考时咬笔头\n3. 开心时眼睛会眯成月牙\n\n`console.log('我爱你');`"
+                    },
+                    {
+                        "id": 4,
+                        "content": "## 最感动的事\n\n那次我生病，你整夜未眠照顾我。\n\n
