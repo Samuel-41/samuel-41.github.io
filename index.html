@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>我们的纪念时刻</title>
+    <!-- 引入marked.js用于Markdown渲染 -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- 引入highlight.js用于代码高亮（Markdown支持） -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', 'Segoe UI', sans-serif;
+            background-color: #fff9fb;
+            color: #333;
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: radial-gradient(#ffcce0 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 500px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+        
+        /* 主图片样式 */
+        .main-image {
+            position: absolute;
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+            z-index: 1;
+            animation: shrinkImage 2s ease-in-out forwards;
+            animation-delay: 0.5s;
+        }
+        
+        @keyframes shrinkImage {
+            0% {
+                width: 100vw;
+                height: 100vh;
+                border-radius: 0;
+                box-shadow: none;
+            }
+            100% {
+                width: 30vw;
+                height: 30vw;
+                border-radius: 50%;
+                box-shadow: 0 0 30px rgba(255, 105, 180, 0.3);
+                border: 6px solid #ffcce0;
+            }
+        }
+        
+        /* 文本框容器 */
+        .text-boxes-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        /* 文本框样式 */
+        .text-box {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            background-color: white;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 5px 20px rgba(255, 105, 180, 0.2);
+            opacity: 0;
+            animation: fadeIn 0.8s forwards;
+            border: 2px solid #ffb6c1;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+        
+        .text-box:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(255, 105, 180, 0.3);
+        }
+        
+        .text-box-content {
+            font-size: 12px;
+            line-height: 1.5;
+            color: #666;
+        }
+        
+        .text-box-content h1, 
+        .text-box-content h2, 
+        .text-box-content h3 {
+            color: #ff69b4;
+            margin-bottom: 5px;
+        }
+        
+        .text-box-content p {
+            margin-bottom: 8px;
+        }
+        
+        .text-box-content ul, 
+        .text-box-content ol {
+            padding-left: 15px;
+            margin-bottom: 8px;
+        }
+        
+        .text-box-content code {
+            background-color: #fff0f5;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-size: 11px;
+        }
+        
+        .text-box-content pre {
+            background-color: #fff5f9;
+            padding: 8px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 11px;
+            margin: 8px 0;
+        }
+        
+        .text-box-content blockquote {
+            border-left: 3px solid #ffb6c1;
+            padding-left: 10px;
+            margin: 8px 0;
+            color: #888;
+            font-style: italic;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* 心形装饰 */
+        .heart {
+            position: absolute;
+            color: #ffb6c1;
+            font-size: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        /* 标题样式 */
+        .title {
+            position: absolute;
+            top: 30px;
+            text-align: center;
+            z-index: 10;
+            opacity: 0;
+            animation: fadeIn 1s forwards;
+            animation-delay: 3s;
+        }
+        
+        .title h1 {
+            color: #ff69b4;
+            font-size: 24px;
+            margin-bottom: 8px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .title p {
+            color: #ff85a2;
+            font-size: 14px;
+        }
+        
+        /* 底部说明 */
+        .footer {
+            position: absolute;
+            bottom: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #ff85a2;
+            opacity: 0;
+            animation: fadeIn 1s forwards;
+            animation-delay: 3.5s;
+        }
+        
+        /* 旋转控制 */
+        .controls {
+            position: absolute;
+            bottom: 60px;
+            display: flex;
+            gap: 15px;
+            z-index: 10;
+            opacity: 0;
+            animation: fadeIn 1s forwards;
+            animation-delay: 3.2s;
+        }
+        
+        .control-btn {
+            background-color: white;
+            border: 2px solid #ffb6c1;
+            color: #ff69b4;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .control-btn:hover {
+            background-color: #ff69b4;
+            color: white;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 480px) {
+            .text-box {
+                width: 110px;
+                height: 110px;
+            }
+            
+            .title h1 {
+                font-size: 22px;
+            }
+        }
+        
+        @media (max-height: 700px) {
+            .title {
+                top: 20px;
+            }
+            
+            .footer {
+                bottom: 15px;
+            }
+            
+            .controls {
+                bottom: 50px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 主图片 -->
+        <img src="https://images.unsplash.com/photo-1518568814500-bf0f8d125f46?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="纪念图片" class="main-image" id="mainImage">
+        
+        <!-- 标题 -->
+        <div class="title">
+            <h1>💕 我们的纪念时刻 💕</h1>
+            <p>每一个瞬间都值得珍藏</p>
+        </div>
+        
+        <!-- 文本框容器 -->
+        <div class="text-boxes-container" id="textContainer">
+            <!-- 文本框将由JavaScript动态生成 -->
+        </div>
+        
+        <!-- 控制按钮 -->
+        <div class="controls">
+            <button class="control-btn" onclick="pauseRotation()">暂停旋转</button>
+            <button class="control-btn" onclick="resumeRotation()">继续旋转</button>
+            <button class="control-btn" onclick="refreshTexts()">刷新内容</button>
+        </div>
+        
+        <!-- 底部说明 -->
+        <div class="footer">
+            <p>❤️ 纪念我们在一起的每一天 ❤️</p>
+        </div>
+        
+        <!-- 心形装饰 -->
+        <div class="heart" style="top: 10%; left: 10%;">❤️</div>
+        <div class="heart" style="top: 15%; right: 15%; animation-delay: 0.5s;">💖</div>
+        <div class="heart" style="bottom: 20%; left: 15%; animation-delay: 1s;">💕</div>
+        <div class="heart" style="bottom: 10%; right: 10%; animation-delay: 1.5s;">💗</div>
+    </div>
+
+    <script>
+        // 模拟JSON数据 - 在实际使用中，您需要创建一个data.json文件
+        const textData = [
+            {
+                "id": 1,
+                "content": "## 第一次相遇\n\n还记得那天阳光正好，你的笑容如春风般温暖。\n\n> 命运让我们相遇，是生命中最美的安排"
+            },
+            {
+                "id": 2,
+                "content": "## 最难忘的约会\n\n- 星空下的漫步\n- 共享的冰淇淋\n- 你的手心的温度\n\n**那一刻，时间仿佛静止了**"
+            },
+            {
+                "id": 3,
+                "content": "## 你的小习惯\n\n1. 早晨的第一杯温水\n2. 思考时咬笔头\n3. 开心时眼睛会眯成月牙\n\n
