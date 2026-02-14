@@ -15,7 +15,7 @@
 
         body {
             min-height: 100vh;
-            background: #fff9fc;  /* 暖白基底 */
+            background: #dbd2d7;  /* 暖白基底 */
             font-family: 'Segoe UI', 'Helvetica Neue', 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif;
             display: flex;
             align-items: center;
@@ -42,7 +42,7 @@
 
         /* 中央图片容器 (A) */
         .center-image-wrapper {
-            width: 30%;          /* 占据屏幕30%面积(宽高基于父容器宽度) */
+            width: 40%;          /* 占据屏幕30%面积(宽高基于父容器宽度) */
             aspect-ratio: 1 / 1; /* 正圆或正方形——看图片形状，用圆角处理 */
             position: relative;
             z-index: 20;
@@ -175,7 +175,7 @@
         /* 缩小后的定位(恢复到原来相对定位) */
         .center-image-wrapper.final-state {
             position: relative;
-            width: 30%;
+            width: 25%;
             top: auto;
             left: auto;
             border-radius: 30px;
@@ -230,11 +230,11 @@
     <div class="frame">
         <!-- 两个粉色装饰 (纯粹氛围) -->
         <div class="decoration-heart">💗🌸💗</div>
-        <div class="decoration-dot"></div>
+        <div class="decoration-dot">🌸 🌸    🌸 🌸</div>
 
         <!-- 图片A包装：一开始全屏，然后缩小至30% -->
         <div id="imageWrapper" class="center-image-wrapper initial-full">
-            <img src="https://picsum.photos/id/102/400/400" alt="情侣纪念插图" class="center-image" id="mainImage">
+            <img src="picture/MainPic.jpeg" alt="牵手影子图" class="center-image" id="mainImage">
             <!-- 注：使用随机图床照片 (picsum 爱情风格 id 102 是朦胧森林) 实际建议更换成情侣图，但保留通用性 -->
         </div>
 
@@ -262,12 +262,59 @@
                 "### ✨ 旋转木马\n我们的爱  *永不落幕*"
             ];
 
+
             // 为了让每次打开随机一些，打乱并取5个
             function getRandomFive() {
                 // 拷贝一份再打乱
                 const shuffled = [...MOCK_JSON_TEXTS].sort(() => Math.random() - 0.5);
                 return shuffled.slice(0, 5);
             }
+            /*//[1]
+            // 状态标志
+            let messageLibrary = [];
+            let dataLoaded = false;
+            
+            // 加载外部JSON文件
+            async function loadMessagesFromJSON() {
+                try {
+                    const response = await fetch('messages.json'); // JSON文件放在同目录下
+                    if (!response.ok) throw new Error('网络响应失败');
+                    const data = await response.json();
+                    messageLibrary = data.messages; // 假设JSON结构为 { messages: [...] }
+                    dataLoaded = true;
+                    console.log('成功加载', messageLibrary.length, '条消息');
+                } catch (error) {
+                    console.error('加载JSON失败，使用内置备用数据', error);
+                    // 备用数据
+                    messageLibrary = [
+                        "**💞 每一天**\n都是纪念日 * forever *",
+                        "## 🍰 纪念日快乐\n> 和你一起  **朝朝暮暮**",
+                        "✨ 你是我\n```\n宇宙中最温柔\n的那颗星```",
+                        "### 💌 写于春天\n我想 *紧紧* 拥抱你  —  **永远**",
+                        "![❤️](https://via.placeholder.com/20/ff99bb/000000?text=❤️)  *相遇*  **即永恒**",
+                        "## 🌸 2025 · 夏\n微风和你都 **特别甜**",
+                        "> 海底月是天上月\n—— **眼前人是心上人**",
+                        "**365天**\n+ 每一天都像初恋",
+                        "## 💘 命中注定\n> 你在哪里，家就在哪里",
+                        "### ✨ 旋转木马\n我们的爱  *永不落幕*"
+                    ];
+                    dataLoaded = true;
+                }
+            }
+
+            // 获取随机五条消息
+            function getRandomFive() {
+                if (!dataLoaded || messageLibrary.length === 0) {
+                    console.warn('消息库未就绪');
+                    return [];
+                }
+                const shuffled = [...messageLibrary].sort(() => Math.random() - 0.5);
+                return shuffled.slice(0, 5);
+            }
+
+            // 立即执行加载（注意：这里是异步的）
+            const loadPromise = loadMessagesFromJSON();
+            //[1]*/
 
             // 图片包装、图片元素、状态提示
             const wrapper = document.getElementById('imageWrapper');
@@ -303,6 +350,36 @@
                 bubble.innerHTML = `<div class="markdown-content">${htmlContent}</div>`;
                 orbit.appendChild(bubble);
             }
+            /*//[1]
+            // 清空orbit
+            orbit.innerHTML = '';
+            
+            // 放置五个气泡
+            for (let i = 0; i < 5; i++) {
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                
+                // 确保有文本可用
+                const rawMarkdown = randomTexts[i] || "💕 默认纪念语";
+                
+                // 解析markdown
+                let htmlContent = '';
+                try {
+                    htmlContent = marked.parse(rawMarkdown);
+                } catch (e) {
+                    htmlContent = `<p>${rawMarkdown}</p>`;
+                }
+                bubble.innerHTML = `<div class="markdown-content">${htmlContent}</div>`;
+                orbit.appendChild(bubble);
+            }
+            
+            // 重新定位气泡
+            repositionBubbles();
+        }
+        
+        // 启动初始化
+        initializeBubbles();
+        //[1]*/
 
             // 现在为每个气泡计算围绕图片的极坐标位置
             // 图片A占据30%宽，且居中。我们以frame中心为旋转中心。frame宽高由js获得，但我们使用百分比单位相对简单。
