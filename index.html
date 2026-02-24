@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>💗 卫星环绕 · 中间层主图 💗</title>
+    <title>💗 爱心飘落 · 卫星环绕纪念 💗</title>
     <!-- 使用 Marked 解析 Markdown -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
@@ -21,22 +21,61 @@
             align-items: center;
             justify-content: center;
             padding: 12px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* 爱心飘落容器 - 覆盖整个视口 */
+        #container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none; /* 让爱心不阻挡点击 */
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        /* 飘落爱心样式 */
+        .heart-decoration {
+            position: absolute;
+            font-size: 24px;
+            color: #ffb6c1; /* 粉色 */
+            z-index: 0;
+            animation: fall 8s linear infinite;
+            opacity: 0.8;
+            user-select: none;
+            pointer-events: none;
+            text-shadow: 0 0 5px rgba(255, 182, 193, 0.5);
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-20vh) rotate(0deg);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(120vh) rotate(360deg);
+                opacity: 0;
+            }
         }
 
         .frame {
             width: 100%;
             max-width: 380px;
             aspect-ratio: 9 / 16;
-            background: rgba(255, 245, 248, 0.6);
-            backdrop-filter: blur(2px);
+            background: rgba(255, 245, 248, 0.85);
+            backdrop-filter: blur(4px);
             border-radius: 48px 48px 32px 32px;
-            box-shadow: 0 20px 40px rgba(245, 150, 180, 0.15),
+            box-shadow: 0 20px 40px rgba(245, 150, 180, 0.25),
                         0 0 0 2px #ffe2eb inset;
             position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: visible;
+            z-index: 10; /* 确保在主容器在爱心上方 */
         }
 
         /* 中央图片容器 - 设置固定层级为 20（中间层） */
@@ -76,7 +115,7 @@
             position: absolute;
             width: 120px;
             max-width: 30vw;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
             background: #fff0f5;
@@ -201,6 +240,9 @@
     </style>
 </head>
 <body>
+    <!-- 爱心飘落容器 -->
+    <div id="container"></div>
+
     <div class="frame">
         <div class="decoration-heart">💗🌸💗</div>
         <div class="decoration-dot"></div>
@@ -218,7 +260,30 @@
 
     <script>
         (function() {
-            // ---------- 1. 数据加载模块 - 支持外部 JSON ----------
+            // ---------- 1. 飘落爱心模块 ----------
+            function createHearts() {
+                const container = document.getElementById('container');
+                if (!container) return;
+                
+                const heartCount = 20; // 心形数量
+                
+                for (let i = 0; i < heartCount; i++) {
+                    const heart = document.createElement('div');
+                    heart.className = 'heart-decoration';
+                    heart.innerHTML = '❤';
+                    heart.style.left = `${Math.random() * 100}vw`;
+                    heart.style.animationDelay = `${Math.random() * 5}s`;
+                    heart.style.fontSize = `${15 + Math.random() * 25}px`; // 15-40px
+                    
+                    // 随机轻微颜色变化
+                    const hue = 340 + Math.random() * 20; // 粉红色系
+                    heart.style.color = `hsl(${hue}, 80%, 80%)`;
+                    
+                    container.appendChild(heart);
+                }
+            }
+
+            // ---------- 2. 数据加载模块 - 支持外部 JSON ----------
             let messageLibrary = [];
             let dataLoaded = false;
             
@@ -294,13 +359,13 @@
                 return shuffled.slice(0, 5);
             }
 
-            // ---------- 2. 图片错误处理 ----------
+            // ---------- 3. 图片错误处理 ----------
             document.getElementById('mainImage').onerror = function() {
                 console.warn('图片加载失败，请检查路径 picture/MainPic.jpeg');
                 this.src = 'data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22400%22%20viewBox%3D%220%200%20400%20400%22%3E%3Crect%20width%3D%22400%22%20height%3D%22400%22%20fill%3D%22%23ffd9e5%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%20fill%3D%22%23b3405c%22%20font-size%3D%2220%22%3E💗%20纪念日%20💗%3C%2Ftext%3E%3C%2Fsvg%3E';
             };
 
-            // ---------- 3. 获取DOM元素 ----------
+            // ---------- 4. 获取DOM元素 ----------
             const wrapper = document.getElementById('imageWrapper');
             const orbit = document.getElementById('orbitContainer');
             const tip = document.getElementById('statusTip');
@@ -309,7 +374,7 @@
             wrapper.classList.remove('final-state');
             wrapper.classList.add('initial-full');
 
-            // ---------- 4. 椭圆轨道定位函数 ----------
+            // ---------- 5. 椭圆轨道定位函数 ----------
             function repositionBubbles() {
                 const frame = document.querySelector('.frame');
                 if (!frame) return;
@@ -362,7 +427,7 @@
                 });
             }
 
-            // ---------- 5. 动画循环 ----------
+            // ---------- 6. 动画循环 ----------
             let animationFrame;
             function startOrbitAnimation() {
                 function animate() {
@@ -372,7 +437,7 @@
                 animationFrame = requestAnimationFrame(animate);
             }
 
-            // ---------- 6. 初始化气泡 (等待数据加载后) ----------
+            // ---------- 7. 初始化气泡 (等待数据加载后) ----------
             const loadPromise = loadMessagesFromJSON();
             
             async function initializeBubbles() {
@@ -410,25 +475,33 @@
             // 执行初始化
             initializeBubbles();
 
-            // ---------- 7. 窗口大小改变时重新计算位置 ----------
+            // ---------- 8. 窗口大小改变时重新计算位置 ----------
             window.addEventListener('resize', () => {
                 repositionBubbles();
             });
 
-            // ---------- 8. 清理动画 ----------
+            // ---------- 9. 清理动画 ----------
             window.addEventListener('beforeunload', function() {
                 if (animationFrame) {
                     cancelAnimationFrame(animationFrame);
                 }
             });
 
-            // ---------- 9. 缩小动画 ----------
+            // ---------- 10. 缩小动画 ----------
             setTimeout(() => {
                 wrapper.classList.remove('initial-full');
                 wrapper.classList.add('final-state');
-                tip.innerText = '💖 卫星环绕 · 爱意永恒 💖';
+                tip.innerText = '💖 爱心飘落 · 卫星环绕 💖';
                 tip.style.opacity = '0.8';
             }, 800);
+
+            // ---------- 11. 创建飘落爱心 ----------
+            // 确保 DOM 加载完成后再创建爱心
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', createHearts);
+            } else {
+                createHearts();
+            }
         })();
     </script>
 
@@ -459,6 +532,7 @@
         - 本地开发时自动使用内置数据（避免 CORS 问题）
         - 部署到 GitHub Pages 时会自动加载同目录下的 messages.json
         - 如需自定义图片，请将图片放在 picture/MainPic.jpeg
+        - 爱心飘落效果会自动运行，营造浪漫氛围
     -->
 </body>
 </html>
