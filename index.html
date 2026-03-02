@@ -248,3 +248,153 @@
         <div class="decoration-dot"></div>
 
         <!-- 图片A包装：使用相对路径 -->
+        <div id="imageWrapper" class="center-image-wrapper initial-full">
+            <img src="picture/MainPic.jpeg" alt="情侣纪念插图" class="center-image" id="mainImage">
+        </div>
+
+        <!-- 旋转容器 (气泡将动态添加至此) -->
+        <div class="orbit-container" id="orbitContainer"></div>
+
+        <div class="loading-tip" id="statusTip">💕 加载浪漫语录中... 💕</div>
+    </div>
+
+    <script>
+        (function() {
+            // ---------- 1. 飘落爱心模块 ----------
+            function createHearts() {
+                const container = document.getElementById('container');
+                if (!container) return;
+                
+                const heartCount = 20; // 心形数量
+                
+                for (let i = 0; i < heartCount; i++) {
+                    const heart = document.createElement('div');
+                    heart.className = 'heart-decoration';
+                    heart.innerHTML = '❤';
+                    heart.style.left = `${Math.random() * 100}vw`;
+                    heart.style.animationDelay = `${Math.random() * 5}s`;
+                    heart.style.fontSize = `${15 + Math.random() * 25}px`; // 15-40px
+                    
+                    // 随机轻微颜色变化
+                    const hue = 340 + Math.random() * 20; // 粉红色系
+                    heart.style.color = `hsl(${hue}, 80%, 80%)`;
+                    
+                    container.appendChild(heart);
+                }
+            }
+
+            // ---------- 2. 数据加载模块 - 支持外部 JSON ----------
+            let messageLibrary = [];
+            let dataLoaded = false;
+            
+            // 加载外部 JSON 文件
+            async function loadMessagesFromJSON() {
+                try {
+                    // 检测是否在本地文件环境
+                    const isLocalFile = window.location.protocol === 'file:';
+                    
+                    if (isLocalFile) {
+                        console.log('本地文件环境，使用内置数据');
+                        // 本地环境直接使用内置数据（避免CORS）
+                        messageLibrary = [
+                            "##理解的开端\n2022/03/11 我们第一次确定能与对方相互理解",
+                            "##第一次牵手\n2022/03/19 有人说手冷要暖一暖",
+                            "##第一次拥抱\n2022/03/26 《她都这么信任我了我怎么能想别的呢》",
+                            "##**The world is so beautiful that I can find a people just like me**",
+                            "##散瞳\n视线完全模糊还帮忙做东西真的是真爱\n嗯，真的是真爱",
+                            "##发酒疯\n2022/10/04 让我们铭记这个伟大却落寞的日子，陛下发酒疯但仍然没有能够勇敢到表白，失望",
+                            "##表白\n2022/10/31 **仿佛波涛汹涌的湖面掉下一颗石头又掀起波澜万丈**",
+                            "##重色轻友\n2022/11/01 给我送书，在楼下聊天把zzc静音\n2026/02/07 聊到一半扔下zzc两个小时",
+                            "##大哥\n大！哥！你那个周三看到的那个女孩，真的是我女朋友哦！",
+                            "##悠哉悠哉，辗转反侧\n这是一首情诗",
+                            "##安心\n你靠着我睡觉的时候慢慢地我也会想睡\n现在新发现是靠着你的时候我也会很舒服想睡",
+                            "##第一次亲\n2023/02/04 “你爱我吗？” “肯定 我爱你”",
+                            "##猜猜币\n没想到吧！地铁单程票！",
+                            "##未来的孩子？\n404 NOT FOUND",
+                            "##哔卟\n哔卟~",
+                            "##缘分\n那你可以选择相信我带来的缘分"
+                        ];
+                        dataLoaded = true;
+                    } else {
+                        // 在线环境使用 fetch
+                        const response = await fetch('messages.json');
+                        if (!response.ok) throw new Error('网络响应失败');
+                        const data = await response.json();
+                        messageLibrary = data.messages;
+                        dataLoaded = true;
+                        console.log('成功加载', messageLibrary.length, '条消息');
+                    }
+                } catch (error) {
+                    console.error('加载失败，使用内置备用数据', error);
+                    // 备用数据
+                    messageLibrary = [
+                        "##理解的开端\n2022/03/11 我们第一次确定能与对方相互理解",
+                        "##第一次牵手\n2022/03/19 有人说手冷要暖一暖",
+                        "##第一次拥抱\n2022/03/26 《她都这么信任我了我怎么能想别的呢》",
+                        "##**The world is so beautiful that I can find a people just like me**",
+                        "##散瞳\n视线完全模糊还帮忙做东西真的是真爱\n嗯，真的是真爱",
+                        "##发酒疯\n2022/10/04 让我们铭记这个伟大却落寞的日子，陛下发酒疯但仍然没有能够勇敢到表白，失望",
+                        "##表白\n2022/10/31 **仿佛波涛汹涌的湖面掉下一颗石头又掀起波澜万丈**",
+                        "##重色轻友\n2022/11/01 给我送书，在楼下聊天把zzc静音\n2026/02/07 聊到一半扔下zzc两个小时",
+                        "##大哥\n大！哥！你那个周三看到的那个女孩，真的是我女朋友哦！",
+                        "##悠哉悠哉，辗转反侧\n这是一首情诗",
+                        "##安心\n你靠着我睡觉的时候慢慢地我也会想睡\n现在新发现是靠着你的时候我也会很舒服想睡",
+                        "##第一次亲\n2023/02/04 “你爱我吗？” “肯定 我爱你”",
+                        "##猜猜币\n没想到吧！地铁单程票！",
+                        "##未来的孩子？\n404 NOT FOUND",
+                        "##哔卟\n哔卟~",
+                        "##缘分\n那你可以选择相信我带来的缘分"
+                    ];
+                    dataLoaded = true;
+                }
+            }
+
+            // 获取随机五条消息
+            function getRandomFive() {
+                if (!dataLoaded || messageLibrary.length === 0) {
+                    console.warn('消息库未就绪，使用默认消息');
+                    return ["💕 加载中...", "💕 请稍候", "💕 即将出现", "💕 爱的寄语", "💕 纪念日快乐"];
+                }
+                const shuffled = [...messageLibrary].sort(() => Math.random() - 0.5);
+                return shuffled.slice(0, 5);
+            }
+
+            // ---------- 3. 图片错误处理 ----------
+            document.getElementById('mainImage').onerror = function() {
+                console.warn('图片加载失败，请检查路径 picture/MainPic.jpeg');
+                this.src = 'data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22400%22%20viewBox%3D%220%200%20400%20400%22%3E%3Crect%20width%3D%22400%22%20height%3D%22400%22%20fill%3D%22%23ffd9e5%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%20fill%3D%22%23b3405c%22%20font-size%3D%2220%22%3E💗%20纪念日%20💗%3C%2Ftext%3E%3C%2Fsvg%3E';
+            };
+
+            // ---------- 4. 获取DOM元素 ----------
+            const wrapper = document.getElementById('imageWrapper');
+            const orbit = document.getElementById('orbitContainer');
+            const tip = document.getElementById('statusTip');
+
+            // 确保初始是全屏模式
+            wrapper.classList.remove('final-state');
+            wrapper.classList.add('initial-full');
+
+            // ---------- 5. 椭圆轨道定位函数 ----------
+            function repositionBubbles() {
+                const frame = document.querySelector('.frame');
+                if (!frame) return;
+                
+                const frameRect = frame.getBoundingClientRect();
+                const centerX = frameRect.width / 2;
+                const centerY = frameRect.height / 2;
+                
+                // 椭圆轨道参数：水平半径较大，垂直半径较小
+                const radiusX = frameRect.width * 0.4;  // 水平轴
+                const radiusY = frameRect.height * 0.2; // 垂直轴
+                
+                const bubbles = document.querySelectorAll('.bubble');
+                if (bubbles.length === 0) return;
+                
+                const angleStep = (2 * Math.PI) / bubbles.length;
+                
+                // 使用时间控制旋转速度 (每 20 秒一圈)
+                const startAngle = (performance.now() / 20000) * 2 * Math.PI;
+                
+                bubbles.forEach((bubble, idx) => {
+                    const angle = startAngle + idx * angleStep;
+                    
