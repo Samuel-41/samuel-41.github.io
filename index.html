@@ -32,16 +32,15 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            pointer-events: none; /* 让爱心不阻挡点击 */
+            pointer-events: none;
             z-index: 1;
             overflow: hidden;
         }
 
-        /* 飘落爱心样式 */
         .heart-decoration {
             position: absolute;
             font-size: 24px;
-            color: #ffb6c1; /* 粉色 */
+            color: #ffb6c1;
             z-index: 0;
             animation: fall 8s linear infinite;
             opacity: 0.8;
@@ -51,16 +50,11 @@
         }
 
         @keyframes fall {
-            0% {
-                transform: translateY(-20vh) rotate(0deg);
-                opacity: 0.8;
-            }
-            100% {
-                transform: translateY(120vh) rotate(360deg);
-                opacity: 0;
-            }
+            0% { transform: translateY(-20vh) rotate(0deg); opacity: 0.8; }
+            100% { transform: translateY(120vh) rotate(360deg); opacity: 0; }
         }
 
+        /* 主框架 */
         .frame {
             width: 100%;
             max-width: 380px;
@@ -68,22 +62,21 @@
             background: rgba(255, 245, 248, 0.85);
             backdrop-filter: blur(4px);
             border-radius: 48px 48px 32px 32px;
-            box-shadow: 0 20px 40px rgba(245, 150, 180, 0.25),
-                        0 0 0 2px #ffe2eb inset;
+            box-shadow: 0 20px 40px rgba(245, 150, 180, 0.25), 0 0 0 2px #ffe2eb inset;
             position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: visible;
-            z-index: 10; /* 确保在主容器在爱心上方 */
+            z-index: 10;
         }
 
-        /* 中央图片容器 - 设置固定层级为 20（中间层） */
+        /* 中央图片容器 - 中间层 */
         .center-image-wrapper {
             width: 30%;
             aspect-ratio: 1 / 1;
             position: relative;
-            z-index: 20;  /* 中间层级：高于 behind (5)，低于 front (35) */
+            z-index: 20;
             border-radius: 30px;
             overflow: hidden;
             box-shadow: 0 15px 25px #ffb6c190, 0 0 0 4px #ffe4ed;
@@ -99,7 +92,7 @@
             background: #ffd9e5;
         }
 
-        /* 轨道容器 - 不再整体旋转 */
+        /* 轨道容器 */
         .orbit-container {
             position: absolute;
             top: 0;
@@ -128,50 +121,40 @@
             line-height: 1.5;
             word-break: break-word;
             pointer-events: auto;
-            transition: transform 0.2s ease, filter 0.3s;
+            transition: transform 0.2s ease, filter 0.3s, box-shadow 0.2s;
             transform-origin: center;
             left: 50%;
             top: 50%;
             opacity: 0;
             animation: bubble-fadein 0.4s forwards;
+            cursor: default;
         }
 
-        /* 淡入动画 */
+        .bubble.clickable {
+            cursor: pointer;
+        }
+        .bubble.clickable:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 25px #ff8da1;
+        }
+
         @keyframes bubble-fadein {
             0% { opacity: 0; transform: scale(0.2); }
             100% { opacity: 1; transform: scale(1); }
         }
 
-        /* 遮挡关系类 - 重新定义层级 */
-        .bubble.behind {
-            z-index: 5;  /* 在主图片后面 (主图片 z-index:20) */
-        }
+        /* 遮挡关系 */
+        .bubble.behind { z-index: 5; }
+        .bubble.front { z-index: 35; }
 
-        .bubble.front {
-            z-index: 35; /* 在主图片前面 (主图片 z-index:20) */
-        }
+        /* 气泡内 markdown */
+        .bubble h1, .bubble h2, .bubble h3 { font-size: 1.3em; color: #c34f6a; margin: 4px 0; }
+        .bubble p { margin: 4px 0; }
+        .bubble em { color: #d66b81; }
+        .bubble strong { color: #b3405c; }
+        .bubble a { color: #b33f5c; text-decoration: underline wavy #ffb0c0 1px; }
 
-        /* 气泡内的 markdown 样式 */
-        .bubble h1, .bubble h2, .bubble h3 {
-            font-size: 1.3em;
-            color: #c34f6a;
-            margin: 4px 0;
-        }
-        .bubble p {
-            margin: 4px 0;
-        }
-        .bubble em {
-            color: #d66b81;
-        }
-        .bubble strong {
-            color: #b3405c;
-        }
-        .bubble a {
-            color: #b33f5c;
-            text-decoration: underline wavy #ffb0c0 1px;
-        }
-
-        /* 全屏缩小动画相关 */
+        /* 全屏缩小动画 */
         .center-image-wrapper.initial-full {
             position: absolute;
             top: 0;
@@ -179,15 +162,11 @@
             width: 100%;
             height: 100%;
             border-radius: 0;
-            z-index: 100;  /* 全屏时在最上层 */
+            z-index: 100;
             box-shadow: none;
             transition: all 1.2s cubic-bezier(0.34, 1.2, 0.55, 1);
         }
-
-        .center-image-wrapper.initial-full .center-image {
-            border-radius: 0;
-        }
-
+        .center-image-wrapper.initial-full .center-image { border-radius: 0; }
         .center-image-wrapper.final-state {
             position: relative;
             width: 30%;
@@ -196,10 +175,10 @@
             border-radius: 30px;
             box-shadow: 0 15px 25px #ffb6c190, 0 0 0 4px #ffe4ed;
             transition: all 1.2s cubic-bezier(0.34, 1.2, 0.55, 1);
-            z-index: 20;  /* 确保最终状态也是中间层 */
+            z-index: 20;
         }
 
-        /* 装饰元素 */
+        /* 装饰 */
         .decoration-dot {
             position: absolute;
             bottom: 12px;
@@ -234,8 +213,70 @@
             padding: 8px;
         }
 
-        .markdown-content {
-            user-select: text;
+        /* 模态框（大卡片）样式 */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 225, 235, 0.7);
+            backdrop-filter: blur(3px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 15vw; /* 四周等宽，占70%屏幕 */
+        }
+        .modal-card {
+            background-color: #fff0f5;
+            width: 100%;
+            height: 100%;
+            border-radius: 36px;
+            box-shadow: 0 20px 40px rgba(200, 120, 140, 0.3), 0 0 0 3px #ffc0d5 inset;
+            padding: 24px;
+            overflow-y: auto;
+            color: #a12f4a;
+            font-size: 16px;
+            line-height: 1.6;
+            position: relative;
+            scrollbar-width: thin;
+            scrollbar-color: #ffa5b9 #ffe4ed;
+        }
+        .modal-card::-webkit-scrollbar {
+            width: 6px;
+        }
+        .modal-card::-webkit-scrollbar-thumb {
+            background: #ffa5b9;
+            border-radius: 10px;
+        }
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 30px;
+            font-weight: bold;
+            color: #b34a67;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            transition: 0.2s;
+            user-select: none;
+        }
+        .modal-close:hover {
+            background: #ffc0d0;
+            transform: scale(1.1);
+        }
+        .modal-card .markdown-content {
+            color: inherit;
+        }
+        .modal-card h1, .modal-card h2, .modal-card h3 {
+            color: #a12f4a;
         }
     </style>
 </head>
