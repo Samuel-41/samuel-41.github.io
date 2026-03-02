@@ -398,3 +398,141 @@
                 bubbles.forEach((bubble, idx) => {
                     const angle = startAngle + idx * angleStep;
                     
+                    // 椭圆轨迹上的坐标
+                    const bubbleCenterX = centerX + radiusX * Math.cos(angle);
+                    const bubbleCenterY = centerY + radiusY * Math.sin(angle);
+                    
+                    // 获取气泡宽高
+                    const w = bubble.offsetWidth;
+                    const h = bubble.offsetHeight;
+                    
+                    if (w === 0 || h === 0) {
+                        bubble.style.left = (bubbleCenterX - 60) + 'px';
+                        bubble.style.top = (bubbleCenterY - 40) + 'px';
+                    } else {
+                        bubble.style.left = (bubbleCenterX - w/2) + 'px';
+                        bubble.style.top = (bubbleCenterY - h/2) + 'px';
+                    }
+                    
+                    // 根据 Y 坐标判断前后遮挡关系
+                    // 当气泡在椭圆下半部分 (sin(angle) > 0) 时在前，上半部分在后
+                    // 主图片 z-index:20 位于中间层
+                    if (Math.sin(angle) > 0) {
+                        bubble.classList.add('front');
+                        bubble.classList.remove('behind');
+                    } else {
+                        bubble.classList.add('behind');
+                        bubble.classList.remove('front');
+                    }
+                });
+            }
+
+            // ---------- 6. 动画循环 ----------
+            let animationFrame;
+            function startOrbitAnimation() {
+                function animate() {
+                    repositionBubbles();
+                    animationFrame = requestAnimationFrame(animate);
+                }
+                animationFrame = requestAnimationFrame(animate);
+            }
+
+            // ---------- 7. 初始化气泡 (等待数据加载后) ----------
+            const loadPromise = loadMessagesFromJSON();
+            
+            async function initializeBubbles() {
+                await loadPromise; // 等待 JSON 加载完成
+                
+                const randomTexts = getRandomFive();
+                
+                // 清空 orbit
+                orbit.innerHTML = '';
+                
+                // 创建五个气泡
+                for (let i = 0; i < 5; i++) {
+                    const bubble = document.createElement('div');
+                    bubble.className = 'bubble';
+                    
+                    const rawMarkdown = randomTexts[i] || "💕 纪念日快乐";
+                    
+                    let htmlContent = '';
+                    try {
+                        htmlContent = marked.parse(rawMarkdown);
+                    } catch (e) {
+                        htmlContent = `<p>${rawMarkdown}</p>`;
+                    }
+                    bubble.innerHTML = `<div class="markdown-content">${htmlContent}</div>`;
+                    orbit.appendChild(bubble);
+                }
+                
+                // 初始定位
+                repositionBubbles();
+                
+                // 启动动画循环
+                startOrbitAnimation();
+            }
+
+            // 执行初始化
+            initializeBubbles();
+
+            // ---------- 8. 窗口大小改变时重新计算位置 ----------
+            window.addEventListener('resize', () => {
+                repositionBubbles();
+            });
+
+            // ---------- 9. 清理动画 ----------
+            window.addEventListener('beforeunload', function() {
+                if (animationFrame) {
+                    cancelAnimationFrame(animationFrame);
+                }
+            });
+
+            // ---------- 10. 缩小动画 ----------
+            setTimeout(() => {
+                wrapper.classList.remove('initial-full');
+                wrapper.classList.add('final-state');
+                tip.innerText = '💖 爱心飘落 · 卫星环绕 💖';
+                tip.style.opacity = '0.8';
+            }, 800);
+
+            // ---------- 11. 创建飘落爱心 ----------
+            // 确保 DOM 加载完成后再创建爱心
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', createHearts);
+            } else {
+                createHearts();
+            }
+        })();
+    </script>
+
+    <!-- ========== 部署说明 ========== -->
+    <!-- 
+        文件结构要求：
+        ├── index.html          (本文件)
+        ├── messages.json       (可选，外部文本库，格式见下)
+        └── picture/
+            └── MainPic.jpeg     (纪念图片，正方形推荐)
+
+        messages.json 格式示例：
+        {
+            "messages": [
+                "##标题\n内容支持 *Markdown*",
+                "##第二条\n多行内容",
+                ...
+            ]
+        }
+
+        GitHub Pages 部署步骤：
+        1. 在 GitHub 新建仓库（如 love-orbit）
+        2. 上传所有文件到仓库根目录
+        3. 仓库 Settings -> Pages -> 选择 main 分支，根目录，保存
+        4. 等待几分钟，访问 https://<用户名>.github.io/<仓库名>/
+        
+        说明：
+        - 本地开发时自动使用内置数据（避免 CORS 问题）
+        - 部署到 GitHub Pages 时会自动加载同目录下的 messages.json
+        - 如需自定义图片，请将图片放在 picture/MainPic.jpeg
+        - 爱心飘落效果会自动运行，营造浪漫氛围
+    -->
+</body>
+</html>
