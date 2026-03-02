@@ -98,3 +98,153 @@
             border-radius: inherit;
             background: #ffd9e5;
         }
+
+        /* 轨道容器 - 不再整体旋转 */
+        .orbit-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 30;
+        }
+
+        /* 气泡基础样式 */
+        .bubble {
+            position: absolute;
+            width: 120px;
+            max-width: 30vw;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            background: #fff0f5;
+            border: 2px solid #ffb3c6;
+            border-radius: 32px 32px 32px 8px;
+            padding: 12px 14px;
+            box-shadow: 0 10px 20px #ffa5b9a0, 0 4px 0 0 #fcc4d2 inset;
+            color: #a93f5c;
+            font-size: 14px;
+            line-height: 1.5;
+            word-break: break-word;
+            pointer-events: auto;
+            transition: transform 0.2s ease, filter 0.3s;
+            transform-origin: center;
+            left: 50%;
+            top: 50%;
+            opacity: 0;
+            animation: bubble-fadein 0.4s forwards;
+        }
+
+        /* 淡入动画 */
+        @keyframes bubble-fadein {
+            0% { opacity: 0; transform: scale(0.2); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        /* 遮挡关系类 - 重新定义层级 */
+        .bubble.behind {
+            z-index: 5;  /* 在主图片后面 (主图片 z-index:20) */
+        }
+
+        .bubble.front {
+            z-index: 35; /* 在主图片前面 (主图片 z-index:20) */
+        }
+
+        /* 气泡内的 markdown 样式 */
+        .bubble h1, .bubble h2, .bubble h3 {
+            font-size: 1.3em;
+            color: #c34f6a;
+            margin: 4px 0;
+        }
+        .bubble p {
+            margin: 4px 0;
+        }
+        .bubble em {
+            color: #d66b81;
+        }
+        .bubble strong {
+            color: #b3405c;
+        }
+        .bubble a {
+            color: #b33f5c;
+            text-decoration: underline wavy #ffb0c0 1px;
+        }
+
+        /* 全屏缩小动画相关 */
+        .center-image-wrapper.initial-full {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 0;
+            z-index: 100;  /* 全屏时在最上层 */
+            box-shadow: none;
+            transition: all 1.2s cubic-bezier(0.34, 1.2, 0.55, 1);
+        }
+
+        .center-image-wrapper.initial-full .center-image {
+            border-radius: 0;
+        }
+
+        .center-image-wrapper.final-state {
+            position: relative;
+            width: 30%;
+            top: auto;
+            left: auto;
+            border-radius: 30px;
+            box-shadow: 0 15px 25px #ffb6c190, 0 0 0 4px #ffe4ed;
+            transition: all 1.2s cubic-bezier(0.34, 1.2, 0.55, 1);
+            z-index: 20;  /* 确保最终状态也是中间层 */
+        }
+
+        /* 装饰元素 */
+        .decoration-dot {
+            position: absolute;
+            bottom: 12px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: radial-gradient(circle at 30% 30%, #ffc1d0, #ffd9e4);
+            border-radius: 50%;
+            opacity: 0.5;
+            z-index: 5;
+        }
+        .decoration-heart {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            font-size: 24px;
+            filter: drop-shadow(0 4px 6px #fbb6c6);
+            z-index: 6;
+            opacity: 0.7;
+        }
+        .loading-tip {
+            position: absolute;
+            bottom: 30px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: #cc8195;
+            font-size: 15px;
+            letter-spacing: 1px;
+            z-index: 10;
+            background: linear-gradient(90deg, transparent, #ffe3ec, transparent);
+            padding: 8px;
+        }
+
+        .markdown-content {
+            user-select: text;
+        }
+    </style>
+</head>
+<body>
+    <!-- 爱心飘落容器 -->
+    <div id="container"></div>
+
+    <div class="frame">
+        <div class="decoration-heart">💗🌸💗</div>
+        <div class="decoration-dot"></div>
+
+        <!-- 图片A包装：使用相对路径 -->
