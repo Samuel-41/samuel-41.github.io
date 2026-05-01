@@ -17,8 +17,8 @@
             --pink-deep: #d6336c;
             --pink-dark: #a61e4d;
             --white: #ffffff;
-            --shadow-soft: 0 4px 20px rgba(251, 111, 146, 0.25);
-            --shadow-card: 0 8px 40px rgba(214, 51, 108, 0.3);
+            --shadow-soft: 0 4px 24px rgba(251, 111, 146, 0.28);
+            --shadow-card: 0 10px 44px rgba(214, 51, 108, 0.32);
             --radius-lg: 24px;
             --radius-xl: 32px;
             --font-serif: 'Georgia', 'Noto Serif SC', 'STSong', 'Songti SC', 'SimSun', serif;
@@ -109,9 +109,6 @@
             position: fixed;
             inset: 0;
             z-index: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             pointer-events: none;
         }
 
@@ -120,41 +117,35 @@
             position: absolute;
             z-index: 10;
             pointer-events: auto;
-            /* 初始全屏，动画后缩小 */
-            width: 100vw;
-            height: 100vh;
-            border-radius: 0;
+            /* 关键修正：统一使用 left:50% top:50% + translate 定位 */
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: var(--radius-xl);
             overflow: hidden;
-            box-shadow: none;
+            box-shadow: var(--shadow-soft);
+            will-change: width, height, border-radius, box-shadow;
             transition:
                 width 1.6s cubic-bezier(0.34, 1.56, 0.64, 1),
                 height 1.6s cubic-bezier(0.34, 1.56, 0.64, 1),
                 border-radius 1.6s cubic-bezier(0.34, 1.56, 0.64, 1),
-                box-shadow 1.6s cubic-bezier(0.34, 1.56, 0.64, 1),
-                left 1.6s cubic-bezier(0.34, 1.56, 0.64, 1),
-                top 1.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-            will-change: width, height, border-radius, box-shadow, left, top;
+                box-shadow 1.6s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
+        /* 全屏初始状态 */
+        .main-image-wrapper.initial {
+            width: 100vw;
+            height: 100vh;
+            border-radius: 0;
+            box-shadow: none;
+        }
+
+        /* 缩小后的目标状态 */
         .main-image-wrapper.shrunk {
             width: min(54vw, 54vh, 240px);
             height: min(54vw, 54vh, 240px);
             border-radius: var(--radius-xl);
             box-shadow: var(--shadow-soft);
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-        }
-
-        /* 初始全屏定位 */
-        .main-image-wrapper.initial {
-            left: 0;
-            top: 0;
-            transform: none;
-            width: 100vw;
-            height: 100vh;
-            border-radius: 0;
-            box-shadow: none;
         }
 
         .main-image-wrapper img {
@@ -165,7 +156,6 @@
             border-radius: inherit;
         }
 
-        /* 图片加载失败占位 */
         .main-image-placeholder {
             width: 100%;
             height: 100%;
@@ -185,42 +175,46 @@
             pointer-events: auto;
             background: var(--white);
             border: 2.5px solid var(--pink);
-            border-radius: 50px;
-            padding: 10px 18px;
-            min-width: 52px;
-            max-width: 130px;
+            /* 关键修正：允许文本换行，移除截断 */
+            border-radius: 22px;
+            padding: 10px 16px;
+            min-width: 64px;
+            max-width: 170px;
             text-align: center;
             cursor: default;
-            box-shadow: 0 2px 12px rgba(251, 111, 146, 0.18);
+            box-shadow: 0 2px 14px rgba(251, 111, 146, 0.2);
             transition:
                 box-shadow 0.3s ease,
                 border-color 0.3s ease,
                 transform 0.15s ease;
             will-change: transform, z-index;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            /* 文本换行 + 保持单词完整性 */
+            white-space: normal;
+            word-break: keep-all;
+            overflow-wrap: break-word;
+            line-height: 1.45;
         }
 
         .bubble.clickable {
             cursor: pointer;
             border-color: var(--pink-mid);
-            box-shadow: 0 2px 16px rgba(251, 111, 146, 0.3);
+            box-shadow: 0 2px 18px rgba(251, 111, 146, 0.34);
             animation: bubblePulse 2.5s ease-in-out infinite;
         }
 
         .bubble.clickable:active {
-            transform: scale(0.92) !important;
-            box-shadow: 0 1px 8px rgba(251, 111, 146, 0.4);
+            transform: scale(0.8) !important;
+            box-shadow: 0 1px 8px rgba(251, 111, 146, 0.45);
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
         }
 
         @keyframes bubblePulse {
             0%,
             100% {
-                box-shadow: 0 2px 14px rgba(251, 111, 146, 0.25);
+                box-shadow: 0 2px 16px rgba(251, 111, 146, 0.28);
             }
             50% {
-                box-shadow: 0 4px 22px rgba(251, 111, 146, 0.45);
+                box-shadow: 0 4px 26px rgba(251, 111, 146, 0.5);
             }
         }
 
@@ -228,9 +222,10 @@
             font-size: 0.85rem;
             font-weight: 500;
             color: var(--pink-dark);
-            line-height: 1.3;
+            line-height: 1.5;
             letter-spacing: 0.02em;
             font-family: var(--font-serif);
+            display: block;
         }
 
         .bubble .bubble-text p {
@@ -248,7 +243,20 @@
             font-style: italic;
         }
 
-        /* 可点击气泡的小指示点 */
+        .bubble .bubble-text h2 {
+            font-size: 0.9rem;
+            margin: 0 0 2px 0;
+            font-weight: 700;
+            color: var(--pink-deep);
+            display: block;
+        }
+
+        .bubble .bubble-text h2+* {
+            display: block;
+            margin-top: 2px;
+        }
+
+        /* 可点击气泡指示点 */
         .bubble.clickable::after {
             content: '';
             position: absolute;
@@ -300,11 +308,9 @@
             position: relative;
             width: 70%;
             height: 70%;
-            /* 四周等宽：各15% */
-            max-width: 500px;
-            max-height: 700px;
+            max-width: 520px;
+            max-height: 720px;
             background: #fff5f7;
-            /* 淡粉色背景 */
             border-radius: var(--radius-lg);
             box-shadow: var(--shadow-card);
             padding: 28px 24px 24px;
@@ -343,7 +349,7 @@
         .modal-close-btn:active {
             background: var(--pink);
             color: var(--white);
-            transform: scale(0.9);
+            transform: scale(0.88);
         }
 
         .modal-scroll {
@@ -370,7 +376,6 @@
         .modal-detail-content {
             font-family: var(--font-serif);
             color: var(--pink-deep);
-            /* 深粉色文字 */
             font-size: 0.95rem;
             line-height: 1.8;
             letter-spacing: 0.03em;
@@ -431,9 +436,10 @@
         /* ========== 响应式微调 ========== */
         @media screen and (max-width: 360px) {
             .bubble {
-                padding: 8px 14px;
-                max-width: 105px;
-                border-radius: 40px;
+                padding: 8px 12px;
+                max-width: 140px;
+                min-width: 52px;
+                border-radius: 18px;
             }
             .bubble .bubble-text {
                 font-size: 0.75rem;
@@ -452,8 +458,8 @@
                 height: min(50vw, 280px);
             }
             .bubble {
-                max-width: 160px;
-                padding: 12px 22px;
+                max-width: 190px;
+                padding: 12px 20px;
             }
             .bubble .bubble-text {
                 font-size: 0.95rem;
@@ -497,8 +503,7 @@
     <script>
         (function() {
             // ==================== 版本标识 ====================
-            // v3.0 - 重构版 | 2024 | 椭圆轨道 + 前后遮挡 + 爱心飘落 + Markdown渲染
-            const APP_VERSION = '3.0.0';
+            const APP_VERSION = '3.1.0';
             console.log(`💕 情侣纪念页 v${APP_VERSION} 已加载`);
 
             // ==================== DOM 引用 ====================
@@ -515,32 +520,15 @@
 
             // ==================== 内置备用数据 ====================
             const FALLBACK_MESSAGES = [
-                { short: '💖 **永远爱你**', detail: '从相遇的那一刻起，我就知道，你是我的命中注定。\n\n每一个日出日落，都想与你分享。\n\n**爱你，直到永远。**' },
-                { short: '🌹 我的唯一', detail: '在这茫茫人海中，\n我找到了你，\n也找到了自己。\n\n> "爱不是彼此凝视，而是一起朝同一个方向看。"\n\n你就是我的方向。' },
-                { short: '✨ 命中注定', detail: '有人说，\n每一次相遇都是久别重逢。\n\n如果是这样，\n那我们前世一定很相爱吧。\n\n*今生继续牵手，走过漫长岁月。*' },
-                { short: '🎀 甜蜜时刻', detail: '和你在一起的每一刻，\n都像糖果一样甜。\n\n- 一起看过的电影\n- 一起走过的街道\n- 一起分享的音乐\n\n**都是我最珍贵的回忆。**' },
-                { short: '💕 心心相印', detail: '不需要太多言语，\n一个眼神就懂。\n\n这就是我们的默契，\n是时间沉淀下来的珍贵礼物。\n\n---\n\n*愿这份心意，永不过期。*' },
-                { short: '🌸 春日与你', detail: '春天因你而更美，\n花开因你而更香。\n\n你是我生命中最绚烂的色彩，\n是我世界里最温暖的光。\n\n**❤️ 爱你**' },
-                { short: '🌟 星空下的约定', detail: '还记得那片星空吗？\n我们许下的约定，\n像星星一样永恒。\n\n无论走到哪里，\n抬头看星星的时候，\n就知道你在想我。' },
-                { short: '💝 小确幸', detail: '生活中的小确幸：\n\n1. 早上醒来看到你的消息\n2. 一起窝在沙发看电影\n3. 手牵手散步\n4. 你做的每一顿饭\n\n**每一个瞬间都值得珍藏。**' },
-                { short: '🎵 心动旋律', detail: '有些歌，\n一听就想起了你。\n\n旋律里有我们的故事，\n歌词里有我们的心情。\n\n*你是我最动听的心跳。*' },
-                { short: '💌 悄悄话', detail: '想对你说的话有很多，\n但最重要的只有一句：\n\n**谢谢你出现在我的生命里。**\n\n有了你，\n每一天都是纪念日。' },
-                { short: '🍀 幸运', detail: '遇见你，\n是我这辈子最幸运的事。\n\n不是偶然，\n是命中注定的安排。\n\n*感恩每一个有你的日子。*' },
-                { short: '🌈 彩虹', detail: '雨后的彩虹，\n像极了我们的爱情——\n\n经历过风雨，\n才更懂得珍惜晴天的美好。\n\n**一起看彩虹吧。**' },
-                // 纯字符串（无detail，不可点击）
-                { short: '💗 爱你哦' },
-                { short: '🥰 每一天' },
-                { short: '💞 心相连' },
-                { short: '🌷 永恒' },
-                { short: '💐 珍贵' },
+                { short: 'Error:Did not load msgfile correctly', detail: 'JUST DO NOT PLAY ANYMORE!GO AND FIX THIS BUG!' },
+                { short: 'Error:Did not load msgfile correctly' },
+                { short: 'Error:Did not load msgfile correctly' },
+                { short: 'Error:Did not load msgfile correctly' },
+                { short: 'Error:Did not load msgfile correctly' },
+                { short: 'Error:Did not load msgfile correctly' },
             ];
 
             // ==================== 数据规范化 ====================
-            /**
-             * 将各种格式的数据条目统一为 { short, detail? }
-             * - 纯字符串 -> { short: 字符串, detail: undefined }
-             * - 对象 { short, detail? } -> 保持不变
-             */
             function normalizeEntry(entry) {
                 if (typeof entry === 'string') {
                     return { short: entry, detail: undefined };
@@ -551,7 +539,6 @@
                         detail: typeof entry.detail === 'string' ? entry.detail : undefined,
                     };
                 }
-                // 无效数据，返回默认
                 console.warn('无效数据条目，已跳过:', entry);
                 return null;
             }
@@ -570,7 +557,6 @@
             function pickRandom(items, count) {
                 if (items.length === 0) return [];
                 const shuffled = [...items];
-                // Fisher-Yates 洗牌
                 for (let i = shuffled.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
                     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
@@ -588,7 +574,6 @@
                 } catch (e) {
                     console.warn('marked.js 渲染失败，使用纯文本:', e);
                 }
-                // Fallback：简单转义HTML并保留换行
                 return text
                     .replace(/&/g, '&amp;')
                     .replace(/</g, '&lt;')
@@ -606,24 +591,20 @@
                     imagePlaceholder.style.display = 'flex';
                 }
             }
-
-            // 暴露到全局作用域（onerror属性需要）
             window.handleImageError = handleImageError;
 
             // ==================== 爱心飘落 ====================
             function createFallingHeart() {
                 const heart = document.createElement('span');
                 heart.classList.add('falling-heart');
-                // 随机选择爱心emoji
                 const heartEmojis = ['❤️', '💕', '💗', '💖', '💝', '💘', '🌸', '🩷', '💓', '💞', '🫶', '✨'];
                 heart.textContent = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
 
-                // 随机参数
-                const size = Math.random() * 22 + 14; // 14-36px
-                const leftPos = Math.random() * 94 + 3; // 3%-97%
-                const duration = Math.random() * 6 + 4; // 4-10秒
-                const delay = Math.random() * 5; // 0-5秒延迟
-                const opacity = Math.random() * 0.5 + 0.35; // 0.35-0.85
+                const size = Math.random() * 22 + 14;
+                const leftPos = Math.random() * 94 + 3;
+                const duration = Math.random() * 6 + 4;
+                const delay = Math.random() * 5;
+                const opacity = Math.random() * 0.5 + 0.35;
 
                 heart.style.cssText = `
                     font-size: ${size}px;
@@ -635,26 +616,22 @@
 
                 heartsLayer.appendChild(heart);
 
-                // 动画结束后移除并创建新的
                 const totalDuration = (duration + delay) * 1000;
                 setTimeout(() => {
                     if (heart.parentNode) {
                         heart.remove();
                     }
-                    // 补充新爱心
                     createFallingHeart();
                 }, totalDuration + 200);
             }
 
             function initHearts() {
-                // 初始创建一批爱心，错开延迟
                 const initialCount = 20;
                 for (let i = 0; i < initialCount; i++) {
                     setTimeout(() => {
                         createFallingHeart();
                     }, i * 250);
                 }
-                // 持续补充
                 setInterval(() => {
                     const currentHearts = heartsLayer.querySelectorAll('.falling-heart').length;
                     if (currentHearts < 25) {
@@ -664,28 +641,27 @@
             }
 
             // ==================== 气泡与轨道 ====================
-            let bubbles = []; // { element, data, angle }
+            let bubbles = [];
             let orbitAnimationId = null;
             let orbitCenterX = 0;
             let orbitCenterY = 0;
-            let orbitRadiusX = 0; // 椭圆水平半轴
-            let orbitRadiusY = 0; // 椭圆垂直半轴
-            const ORBIT_SPEED = 0.004; // 每帧旋转弧度（约0.23度/帧，60fps下约14度/秒，一圈约26秒）
+            let orbitRadiusX = 0;
+            let orbitRadiusY = 0;
+            const ORBIT_SPEED = 0.004;
             const BUBBLE_COUNT = 5;
+            let orbitStarted = false;
 
             function updateOrbitParams() {
                 const wrapperRect = mainImageWrapper.getBoundingClientRect();
                 orbitCenterX = wrapperRect.left + wrapperRect.width / 2;
                 orbitCenterY = wrapperRect.top + wrapperRect.height / 2;
 
-                // 椭圆半轴：图片尺寸的0.75倍 + 气泡预估半径
-                const avgBubbleSize = 55; // 气泡平均半径估算
+                const avgBubbleSize = 65;
                 orbitRadiusX = wrapperRect.width * 0.72 + avgBubbleSize;
                 orbitRadiusY = wrapperRect.height * 0.58 + avgBubbleSize;
 
-                // 确保最小轨道尺寸
-                orbitRadiusX = Math.max(orbitRadiusX, 120);
-                orbitRadiusY = Math.max(orbitRadiusY, 85);
+                orbitRadiusX = Math.max(orbitRadiusX, 130);
+                orbitRadiusY = Math.max(orbitRadiusY, 95);
             }
 
             function createBubbleElement(item, index) {
@@ -697,20 +673,17 @@
                 }
                 el.setAttribute('data-index', index);
 
-                // 渲染短文本的Markdown
                 const renderedShort = renderMarkdown(item.short);
                 const textSpan = document.createElement('span');
                 textSpan.classList.add('bubble-text');
                 textSpan.innerHTML = renderedShort;
                 el.appendChild(textSpan);
 
-                // 点击事件
                 if (item.detail) {
                     el.addEventListener('click', (e) => {
                         e.stopPropagation();
                         openDetailModal(item.detail);
                     });
-                    // 触摸事件防止延迟
                     el.addEventListener('touchend', (e) => {
                         e.stopPropagation();
                         e.preventDefault();
@@ -718,7 +691,6 @@
                     });
                 }
 
-                // 初始隐藏（开场动画结束后显示）
                 el.style.opacity = '0';
                 el.style.transition = 'opacity 0.6s ease';
 
@@ -730,16 +702,14 @@
                 const x = orbitCenterX + orbitRadiusX * Math.cos(angle);
                 const y = orbitCenterY + orbitRadiusY * Math.sin(angle);
 
-                // 使用transform定位（相对于scene，因为scene是fixed且inset:0）
-                // 需要转换为相对于视口的坐标
                 el.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`;
 
-                // z-index：下半部分在前面，上半部分在后面
                 const isBelowCenter = y > orbitCenterY;
                 el.style.zIndex = isBelowCenter ? '15' : '5';
             }
 
             function startOrbitAnimation() {
+                if (orbitAnimationId) return;
                 updateOrbitParams();
 
                 function animate() {
@@ -747,7 +717,6 @@
 
                     for (let i = 0; i < bubbles.length; i++) {
                         bubbles[i].angle += ORBIT_SPEED;
-                        // 保持角度在0-2π范围内
                         if (bubbles[i].angle > Math.PI * 2) {
                             bubbles[i].angle -= Math.PI * 2;
                         }
@@ -758,6 +727,8 @@
                 }
 
                 orbitAnimationId = requestAnimationFrame(animate);
+                orbitStarted = true;
+                console.log('🪐 轨道动画已启动');
             }
 
             function stopOrbitAnimation() {
@@ -765,12 +736,14 @@
                     cancelAnimationFrame(orbitAnimationId);
                     orbitAnimationId = null;
                 }
+                orbitStarted = false;
             }
 
             function showBubbles() {
                 bubbles.forEach(b => {
                     b.element.style.opacity = '1';
                 });
+                console.log('💬 气泡已显示');
             }
 
             function clearBubbles() {
@@ -792,9 +765,8 @@
                     return;
                 }
 
-                // 均匀分布初始角度
                 const angleStep = (Math.PI * 2) / selected.length;
-                const startOffset = -Math.PI / 2; // 从顶部开始
+                const startOffset = -Math.PI / 2;
 
                 selected.forEach((item, i) => {
                     const el = createBubbleElement(item, i);
@@ -806,13 +778,14 @@
                     });
                 });
 
-                // 初始定位
+                // 用初始全屏位置做一次预定位（不重要，反正此时气泡隐藏）
                 updateOrbitParams();
                 bubbles.forEach(b => {
                     positionBubbleOnOrbit(b.element, b.angle);
                 });
 
-                startOrbitAnimation();
+                // 关键修正：不在此处启动轨道动画！
+                // 轨道动画将在开场动画结束后启动
             }
 
             // ==================== 详情弹窗 ====================
@@ -829,31 +802,26 @@
             function closeDetailModal() {
                 modalOverlay.classList.remove('active');
                 document.body.style.overflow = '';
-                // 延迟清空内容，保留过渡效果
                 setTimeout(() => {
                     modalDetailContent.innerHTML = '';
                 }, 350);
             }
 
-            // 关闭按钮
             modalCloseBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 closeDetailModal();
             });
 
-            // 点击遮罩关闭
             modalOverlay.addEventListener('click', (e) => {
                 if (e.target === modalOverlay) {
                     closeDetailModal();
                 }
             });
 
-            // 阻止弹窗卡片点击冒泡
             modalCard.addEventListener('click', (e) => {
                 e.stopPropagation();
             });
 
-            // ESC关闭
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape' && modalOverlay.classList.contains('active')) {
                     closeDetailModal();
@@ -862,20 +830,28 @@
 
             // ==================== 开场动画 ====================
             function startIntroAnimation() {
-                // 图片初始状态：全屏（initial类）
-                // 延迟一帧后切换到shrunk类触发缩小动画
                 requestAnimationFrame(() => {
                     requestAnimationFrame(() => {
                         mainImageWrapper.classList.remove('initial');
                         mainImageWrapper.classList.add('shrunk');
+                        console.log('🎬 开场动画开始，图片缩小中...');
                     });
                 });
 
-                // 缩小动画持续约1.6秒，之后显示气泡
-                const bubbleAppearDelay = 1700; // 略长于CSS transition时间
+                // 关键修正：等动画结束后再启动轨道 + 显示气泡
+                const TRANSITION_DURATION = 1700; // 略长于CSS transition 1.6s
                 setTimeout(() => {
+                    console.log('🎬 动画结束，启动轨道与气泡');
+                    updateOrbitParams();
+                    // 重新定位所有气泡
+                    bubbles.forEach(b => {
+                        positionBubbleOnOrbit(b.element, b.angle);
+                    });
+                    // 启动轨道动画
+                    startOrbitAnimation();
+                    // 显示气泡
                     showBubbles();
-                }, bubbleAppearDelay);
+                }, TRANSITION_DURATION);
             }
 
             // ==================== 窗口大小调整 ====================
@@ -884,8 +860,8 @@
             function handleResize() {
                 clearTimeout(resizeDebounceTimer);
                 resizeDebounceTimer = setTimeout(() => {
+                    if (!orbitStarted) return;
                     updateOrbitParams();
-                    // 重新定位所有气泡
                     if (bubbles.length > 0) {
                         bubbles.forEach(b => {
                             positionBubbleOnOrbit(b.element, b.angle);
@@ -908,7 +884,6 @@
                     return normalizeData(FALLBACK_MESSAGES);
                 }
 
-                // 在线环境：尝试fetch外部JSON
                 try {
                     console.log('🌐 尝试加载 messages.json...');
                     const response = await fetch('messages.json', {
@@ -916,7 +891,6 @@
                         headers: {
                             'Accept': 'application/json',
                         },
-                        // 超时处理
                         signal: AbortSignal.timeout ? AbortSignal.timeout(5000) : undefined,
                     });
 
@@ -943,18 +917,17 @@
             async function init() {
                 console.log('🚀 初始化开始...');
 
-                // 1. 启动爱心飘落（视觉氛围先行）
+                // 1. 爱心飘落
                 initHearts();
 
                 // 2. 加载数据
                 const messages = await loadMessages();
                 console.log(`📋 可用数据: ${messages.length} 条`);
 
-                // 3. 初始化气泡（暂不显示）
+                // 3. 初始化气泡（隐藏状态，轨道尚未启动）
                 initBubbles(messages);
 
-                // 4. 启动开场动画（图片缩小 + 延迟显示气泡）
-                // 短暂延迟确保布局计算完成
+                // 4. 启动开场动画
                 setTimeout(() => {
                     startIntroAnimation();
                 }, 300);
@@ -963,19 +936,18 @@
             }
 
             // ==================== 启动应用 ====================
-            // 等待DOM和资源就绪
             if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', init);
             } else {
                 init();
             }
 
-            // ==================== 页面卸载清理 ====================
+            // ==================== 清理 ====================
             window.addEventListener('beforeunload', () => {
                 stopOrbitAnimation();
             });
 
-            // ==================== 暴露调试接口 ====================
+            // ==================== 调试接口 ====================
             if (typeof window !== 'undefined') {
                 window.__lovePage = {
                     version: APP_VERSION,
@@ -984,13 +956,20 @@
                     resetAnimation: () => {
                         mainImageWrapper.classList.add('initial');
                         mainImageWrapper.classList.remove('shrunk');
+                        stopOrbitAnimation();
                         bubbles.forEach(b => { b.element.style.opacity = '0'; });
                         setTimeout(() => startIntroAnimation(), 300);
                     },
                     reloadData: async () => {
                         const messages = await loadMessages();
                         initBubbles(messages);
-                        showBubbles();
+                        // 重新触发动画结束后的流程
+                        setTimeout(() => {
+                            updateOrbitParams();
+                            bubbles.forEach(b => positionBubbleOnOrbit(b.element, b.angle));
+                            startOrbitAnimation();
+                            showBubbles();
+                        }, 100);
                         console.log('🔄 数据已重新加载');
                     },
                 };
