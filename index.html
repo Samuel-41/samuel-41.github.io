@@ -1,538 +1,1002 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>💗 爱心飘落 · 卫星环绕纪念 💗</title>
-    <!-- 使用 Marked 解析 Markdown -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>我们的纪念日</title>
+
+    <!-- Markdown 渲染库 -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js">
+    </script>
+
     <style>
+        :root {
+            --pink-light: #fff0f3;
+            --pink: #ffb3c1;
+            --pink-mid: #fb6f92;
+            --pink-deep: #d6336c;
+            --pink-dark: #a61e4d;
+            --white: #ffffff;
+            --shadow-soft: 0 4px 20px rgba(251, 111, 146, 0.25);
+            --shadow-card: 0 8px 40px rgba(214, 51, 108, 0.3);
+            --radius-lg: 24px;
+            --radius-xl: 32px;
+            --font-serif: 'Georgia', 'Noto Serif SC', 'STSong', 'Songti SC', 'SimSun', serif;
+            --font-sans: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        html,
         body {
-            min-height: 100vh;
-            background: #fff9fc;
-            font-family: 'Segoe UI', 'Helvetica Neue', 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 12px;
-            overflow-x: hidden;
-            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: var(--font-sans);
+            background: linear-gradient(170deg, #fff5f7 0%, #ffe4e9 30%, #fff0f3 60%, #fff5f7 100%);
+            -webkit-tap-highlight-color: transparent;
+            -webkit-font-smoothing: antialiased;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-overflow-scrolling: touch;
         }
 
-        /* 爱心飘落容器 - 覆盖整个视口 */
-        #container {
+        /* ========== 爱心飘落容器 ========== */
+        .hearts-layer {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            pointer-events: none; /* 让爱心不阻挡点击 */
-            z-index: 1;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
             overflow: hidden;
         }
 
-        /* 飘落爱心样式 */
-        .heart-decoration {
+        .falling-heart {
             position: absolute;
-            font-size: 24px;
-            color: #ffb6c1; /* 粉色 */
-            z-index: 0;
-            animation: fall 8s linear infinite;
-            opacity: 0.8;
-            user-select: none;
+            top: -60px;
+            font-size: 22px;
+            opacity: 0;
             pointer-events: none;
-            text-shadow: 0 0 5px rgba(255, 182, 193, 0.5);
+            animation: heartFall linear infinite;
+            filter: blur(0.5px);
+            will-change: transform, opacity;
         }
 
-        @keyframes fall {
+        @keyframes heartFall {
             0% {
-                transform: translateY(-20vh) rotate(0deg);
-                opacity: 0.8;
-            }
-            100% {
-                transform: translateY(120vh) rotate(360deg);
+                transform: translateY(-60px) rotate(0deg) scale(0.6);
                 opacity: 0;
             }
+            5% {
+                opacity: 0.85;
+                transform: translateY(0px) rotate(15deg) scale(1);
+            }
+            15% {
+                opacity: 0.7;
+                transform: translateY(12vh) rotate(-20deg) scale(1.1);
+            }
+            30% {
+                opacity: 0.75;
+                transform: translateY(25vh) rotate(30deg) scale(0.85);
+            }
+            50% {
+                opacity: 0.55;
+                transform: translateY(45vh) rotate(-35deg) scale(1.05);
+            }
+            70% {
+                opacity: 0.5;
+                transform: translateY(62vh) rotate(25deg) scale(0.7);
+            }
+            85% {
+                opacity: 0.3;
+                transform: translateY(78vh) rotate(-15deg) scale(0.9);
+            }
+            95% {
+                opacity: 0.1;
+                transform: translateY(92vh) rotate(10deg) scale(0.5);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(105vh) rotate(0deg) scale(0.3);
+            }
         }
 
-        .frame {
-            width: 100%;
-            max-width: 380px;
-            aspect-ratio: 9 / 16;
-            background: rgba(255, 245, 248, 0.85);
-            backdrop-filter: blur(4px);
-            border-radius: 48px 48px 32px 32px;
-            box-shadow: 0 20px 40px rgba(245, 150, 180, 0.25),
-                        0 0 0 2px #ffe2eb inset;
-            position: relative;
+        /* ========== 场景容器 ========== */
+        .scene {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: visible;
-            z-index: 10; /* 确保在主容器在爱心上方 */
+            pointer-events: none;
         }
 
-        /* 中央图片容器 - 设置固定层级为 20（中间层） */
-        .center-image-wrapper {
-            width: 30%;
-            aspect-ratio: 1 / 1;
-            position: relative;
-            z-index: 20;  /* 中间层级：高于 behind (5)，低于 front (35) */
-            border-radius: 30px;
+        /* ========== 主图片 ========== */
+        .main-image-wrapper {
+            position: absolute;
+            z-index: 10;
+            pointer-events: auto;
+            /* 初始全屏，动画后缩小 */
+            width: 100vw;
+            height: 100vh;
+            border-radius: 0;
             overflow: hidden;
-            box-shadow: 0 15px 25px #ffb6c190, 0 0 0 4px #ffe4ed;
-            transition: all 0.1s ease;
+            box-shadow: none;
+            transition:
+                width 1.6s cubic-bezier(0.34, 1.56, 0.64, 1),
+                height 1.6s cubic-bezier(0.34, 1.56, 0.64, 1),
+                border-radius 1.6s cubic-bezier(0.34, 1.56, 0.64, 1),
+                box-shadow 1.6s cubic-bezier(0.34, 1.56, 0.64, 1),
+                left 1.6s cubic-bezier(0.34, 1.56, 0.64, 1),
+                top 1.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            will-change: width, height, border-radius, box-shadow, left, top;
         }
 
-        .center-image {
+        .main-image-wrapper.shrunk {
+            width: min(54vw, 54vh, 240px);
+            height: min(54vw, 54vh, 240px);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-soft);
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* 初始全屏定位 */
+        .main-image-wrapper.initial {
+            left: 0;
+            top: 0;
+            transform: none;
+            width: 100vw;
+            height: 100vh;
+            border-radius: 0;
+            box-shadow: none;
+        }
+
+        .main-image-wrapper img {
             width: 100%;
             height: 100%;
             object-fit: cover;
             display: block;
             border-radius: inherit;
-            background: #ffd9e5;
         }
 
-        /* 轨道容器 - 不再整体旋转 */
-        .orbit-container {
-            position: absolute;
-            top: 0;
-            left: 0;
+        /* 图片加载失败占位 */
+        .main-image-placeholder {
             width: 100%;
             height: 100%;
-            pointer-events: none;
-            z-index: 30;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #ffd6e0, #ffb3c6);
+            color: var(--pink-deep);
+            font-size: 3rem;
+            border-radius: inherit;
         }
 
-        /* 气泡基础样式 */
+        /* ========== 气泡 ========== */
         .bubble {
             position: absolute;
-            width: 120px;
-            max-width: 30vw;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            background: #fff0f5;
-            border: 2px solid #ffb3c6;
-            border-radius: 32px 32px 32px 8px;
-            padding: 12px 14px;
-            box-shadow: 0 10px 20px #ffa5b9a0, 0 4px 0 0 #fcc4d2 inset;
-            color: #a93f5c;
-            font-size: 14px;
-            line-height: 1.5;
-            word-break: break-word;
-            pointer-events: auto;
-            transition: transform 0.2s ease, filter 0.3s;
-            transform-origin: center;
-            left: 50%;
-            top: 50%;
-            opacity: 0;
-            animation: bubble-fadein 0.4s forwards;
-        }
-
-        /* 淡入动画 */
-        @keyframes bubble-fadein {
-            0% { opacity: 0; transform: scale(0.2); }
-            100% { opacity: 1; transform: scale(1); }
-        }
-
-        /* 遮挡关系类 - 重新定义层级 */
-        .bubble.behind {
-            z-index: 5;  /* 在主图片后面 (主图片 z-index:20) */
-        }
-
-        .bubble.front {
-            z-index: 35; /* 在主图片前面 (主图片 z-index:20) */
-        }
-
-        /* 气泡内的 markdown 样式 */
-        .bubble h1, .bubble h2, .bubble h3 {
-            font-size: 1.3em;
-            color: #c34f6a;
-            margin: 4px 0;
-        }
-        .bubble p {
-            margin: 4px 0;
-        }
-        .bubble em {
-            color: #d66b81;
-        }
-        .bubble strong {
-            color: #b3405c;
-        }
-        .bubble a {
-            color: #b33f5c;
-            text-decoration: underline wavy #ffb0c0 1px;
-        }
-
-        /* 全屏缩小动画相关 */
-        .center-image-wrapper.initial-full {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border-radius: 0;
-            z-index: 100;  /* 全屏时在最上层 */
-            box-shadow: none;
-            transition: all 1.2s cubic-bezier(0.34, 1.2, 0.55, 1);
-        }
-
-        .center-image-wrapper.initial-full .center-image {
-            border-radius: 0;
-        }
-
-        .center-image-wrapper.final-state {
-            position: relative;
-            width: 30%;
-            top: auto;
-            left: auto;
-            border-radius: 30px;
-            box-shadow: 0 15px 25px #ffb6c190, 0 0 0 4px #ffe4ed;
-            transition: all 1.2s cubic-bezier(0.34, 1.2, 0.55, 1);
-            z-index: 20;  /* 确保最终状态也是中间层 */
-        }
-
-        /* 装饰元素 */
-        .decoration-dot {
-            position: absolute;
-            bottom: 12px;
-            right: 20px;
-            width: 50px;
-            height: 50px;
-            background: radial-gradient(circle at 30% 30%, #ffc1d0, #ffd9e4);
-            border-radius: 50%;
-            opacity: 0.5;
             z-index: 5;
-        }
-        .decoration-heart {
-            position: absolute;
-            top: 16px;
-            left: 16px;
-            font-size: 24px;
-            filter: drop-shadow(0 4px 6px #fbb6c6);
-            z-index: 6;
-            opacity: 0.7;
-        }
-        .loading-tip {
-            position: absolute;
-            bottom: 30px;
-            left: 0;
-            right: 0;
+            pointer-events: auto;
+            background: var(--white);
+            border: 2.5px solid var(--pink);
+            border-radius: 50px;
+            padding: 10px 18px;
+            min-width: 52px;
+            max-width: 130px;
             text-align: center;
-            color: #cc8195;
-            font-size: 15px;
-            letter-spacing: 1px;
-            z-index: 10;
-            background: linear-gradient(90deg, transparent, #ffe3ec, transparent);
-            padding: 8px;
+            cursor: default;
+            box-shadow: 0 2px 12px rgba(251, 111, 146, 0.18);
+            transition:
+                box-shadow 0.3s ease,
+                border-color 0.3s ease,
+                transform 0.15s ease;
+            will-change: transform, z-index;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        .markdown-content {
-            user-select: text;
+        .bubble.clickable {
+            cursor: pointer;
+            border-color: var(--pink-mid);
+            box-shadow: 0 2px 16px rgba(251, 111, 146, 0.3);
+            animation: bubblePulse 2.5s ease-in-out infinite;
+        }
+
+        .bubble.clickable:active {
+            transform: scale(0.92) !important;
+            box-shadow: 0 1px 8px rgba(251, 111, 146, 0.4);
+        }
+
+        @keyframes bubblePulse {
+            0%,
+            100% {
+                box-shadow: 0 2px 14px rgba(251, 111, 146, 0.25);
+            }
+            50% {
+                box-shadow: 0 4px 22px rgba(251, 111, 146, 0.45);
+            }
+        }
+
+        .bubble .bubble-text {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--pink-dark);
+            line-height: 1.3;
+            letter-spacing: 0.02em;
+            font-family: var(--font-serif);
+        }
+
+        .bubble .bubble-text p {
+            margin: 0;
+            display: inline;
+        }
+
+        .bubble .bubble-text strong {
+            color: var(--pink-deep);
+            font-weight: 700;
+        }
+
+        .bubble .bubble-text em {
+            color: var(--pink-mid);
+            font-style: italic;
+        }
+
+        /* 可点击气泡的小指示点 */
+        .bubble.clickable::after {
+            content: '';
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 12px;
+            height: 12px;
+            background: var(--pink-mid);
+            border-radius: 50%;
+            border: 2px solid var(--white);
+            box-shadow: 0 1px 4px rgba(214, 51, 108, 0.4);
+            animation: dotBlink 2s ease-in-out infinite;
+        }
+
+        @keyframes dotBlink {
+            0%,
+            100% {
+                opacity: 0.6;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.3);
+            }
+        }
+
+        /* ========== 详情弹窗 ========== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            background: rgba(166, 30, 77, 0.45);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-card {
+            position: relative;
+            width: 70%;
+            height: 70%;
+            /* 四周等宽：各15% */
+            max-width: 500px;
+            max-height: 700px;
+            background: #fff5f7;
+            /* 淡粉色背景 */
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-card);
+            padding: 28px 24px 24px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transform: translateY(30px) scale(0.94);
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .modal-overlay.active .modal-card {
+            transform: translateY(0) scale(1);
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: var(--pink-light);
+            color: var(--pink-deep);
+            font-size: 1.3rem;
+            cursor: pointer;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s ease;
+            box-shadow: 0 2px 8px rgba(214, 51, 108, 0.15);
+            line-height: 1;
+        }
+
+        .modal-close-btn:active {
+            background: var(--pink);
+            color: var(--white);
+            transform: scale(0.9);
+        }
+
+        .modal-scroll {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-right: 4px;
+            -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
+        }
+
+        .modal-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+        .modal-scroll::-webkit-scrollbar-track {
+            background: transparent;
+            border-radius: 4px;
+        }
+        .modal-scroll::-webkit-scrollbar-thumb {
+            background: var(--pink);
+            border-radius: 4px;
+        }
+
+        .modal-detail-content {
+            font-family: var(--font-serif);
+            color: var(--pink-deep);
+            /* 深粉色文字 */
+            font-size: 0.95rem;
+            line-height: 1.8;
+            letter-spacing: 0.03em;
+            word-break: break-word;
+        }
+
+        .modal-detail-content p {
+            margin-bottom: 0.8em;
+        }
+        .modal-detail-content p:last-child {
+            margin-bottom: 0;
+        }
+        .modal-detail-content strong {
+            color: var(--pink-dark);
+            font-weight: 700;
+        }
+        .modal-detail-content em {
+            color: var(--pink-mid);
+        }
+        .modal-detail-content a {
+            color: var(--pink-mid);
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+        .modal-detail-content blockquote {
+            border-left: 3px solid var(--pink);
+            padding-left: 14px;
+            margin: 0.6em 0;
+            color: #c44a6e;
+            font-style: italic;
+        }
+        .modal-detail-content ul,
+        .modal-detail-content ol {
+            padding-left: 1.4em;
+            margin: 0.5em 0;
+        }
+        .modal-detail-content li {
+            margin-bottom: 0.3em;
+        }
+        .modal-detail-content hr {
+            border: none;
+            border-top: 1.5px dashed var(--pink);
+            margin: 1em 0;
+        }
+        .modal-detail-content code {
+            background: #ffe4ea;
+            padding: 2px 7px;
+            border-radius: 6px;
+            font-size: 0.85em;
+            color: var(--pink-dark);
+        }
+        .modal-detail-content img {
+            max-width: 100%;
+            border-radius: 12px;
+            margin: 0.5em 0;
+        }
+
+        /* ========== 响应式微调 ========== */
+        @media screen and (max-width: 360px) {
+            .bubble {
+                padding: 8px 14px;
+                max-width: 105px;
+                border-radius: 40px;
+            }
+            .bubble .bubble-text {
+                font-size: 0.75rem;
+            }
+            .modal-card {
+                padding: 22px 16px 18px;
+            }
+            .modal-detail-content {
+                font-size: 0.85rem;
+            }
+        }
+
+        @media screen and (min-width: 500px) {
+            .main-image-wrapper.shrunk {
+                width: min(50vw, 280px);
+                height: min(50vw, 280px);
+            }
+            .bubble {
+                max-width: 160px;
+                padding: 12px 22px;
+            }
+            .bubble .bubble-text {
+                font-size: 0.95rem;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- 爱心飘落容器 -->
-    <div id="container"></div>
 
-    <div class="frame">
-        <div class="decoration-heart">💗🌸💗</div>
-        <div class="decoration-dot"></div>
+    <!-- ==================== 爱心飘落层 ==================== -->
+    <div class="hearts-layer" id="heartsLayer" aria-hidden="true"></div>
 
-        <!-- 图片A包装：使用相对路径 -->
-        <div id="imageWrapper" class="center-image-wrapper initial-full">
-            <img src="picture/MainPic.jpeg" alt="情侣纪念插图" class="center-image" id="mainImage">
+    <!-- ==================== 场景容器 ==================== -->
+    <div class="scene" id="scene">
+        <!-- 主图片 -->
+        <div class="main-image-wrapper initial" id="mainImageWrapper">
+            <img
+            src="picture/MainPic.jpeg"
+            alt="我们的照片"
+            id="mainImage"
+            loading="eager"
+            onerror="handleImageError()"
+            >
+            <div class="main-image-placeholder" id="imagePlaceholder" style="display:none;">
+                💕
+            </div>
         </div>
+        <!-- 气泡由JS动态创建并插入scene -->
+    </div>
 
-        <!-- 旋转容器 (气泡将动态添加至此) -->
-        <div class="orbit-container" id="orbitContainer"></div>
-
-        <div class="loading-tip" id="statusTip">💕 加载浪漫语录中... 💕</div>
+    <!-- ==================== 详情弹窗 ==================== -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-card" id="modalCard">
+            <button class="modal-close-btn" id="modalCloseBtn" aria-label="关闭详情">✕</button>
+            <div class="modal-scroll" id="modalScroll">
+                <div class="modal-detail-content" id="modalDetailContent"></div>
+            </div>
+        </div>
     </div>
 
     <script>
         (function() {
-            // ---------- 1. 飘落爱心模块 ----------
-            function createHearts() {
-                const container = document.getElementById('container');
-                if (!container) return;
-                
-                const heartCount = 20; // 心形数量
-                
-                for (let i = 0; i < heartCount; i++) {
-                    const heart = document.createElement('div');
-                    heart.className = 'heart-decoration';
-                    heart.innerHTML = '❤';
-                    heart.style.left = `${Math.random() * 100}vw`;
-                    heart.style.animationDelay = `${Math.random() * 5}s`;
-                    heart.style.fontSize = `${15 + Math.random() * 25}px`; // 15-40px
-                    
-                    // 随机轻微颜色变化
-                    const hue = 340 + Math.random() * 20; // 粉红色系
-                    heart.style.color = `hsl(${hue}, 80%, 80%)`;
-                    
-                    container.appendChild(heart);
+            // ==================== 版本标识 ====================
+            // v3.0 - 重构版 | 2024 | 椭圆轨道 + 前后遮挡 + 爱心飘落 + Markdown渲染
+            const APP_VERSION = '3.0.0';
+            console.log(`💕 情侣纪念页 v${APP_VERSION} 已加载`);
+
+            // ==================== DOM 引用 ====================
+            const heartsLayer = document.getElementById('heartsLayer');
+            const scene = document.getElementById('scene');
+            const mainImageWrapper = document.getElementById('mainImageWrapper');
+            const mainImage = document.getElementById('mainImage');
+            const imagePlaceholder = document.getElementById('imagePlaceholder');
+            const modalOverlay = document.getElementById('modalOverlay');
+            const modalCard = document.getElementById('modalCard');
+            const modalScroll = document.getElementById('modalScroll');
+            const modalDetailContent = document.getElementById('modalDetailContent');
+            const modalCloseBtn = document.getElementById('modalCloseBtn');
+
+            // ==================== 内置备用数据 ====================
+            const FALLBACK_MESSAGES = [
+                { short: '💖 **永远爱你**', detail: '从相遇的那一刻起，我就知道，你是我的命中注定。\n\n每一个日出日落，都想与你分享。\n\n**爱你，直到永远。**' },
+                { short: '🌹 我的唯一', detail: '在这茫茫人海中，\n我找到了你，\n也找到了自己。\n\n> "爱不是彼此凝视，而是一起朝同一个方向看。"\n\n你就是我的方向。' },
+                { short: '✨ 命中注定', detail: '有人说，\n每一次相遇都是久别重逢。\n\n如果是这样，\n那我们前世一定很相爱吧。\n\n*今生继续牵手，走过漫长岁月。*' },
+                { short: '🎀 甜蜜时刻', detail: '和你在一起的每一刻，\n都像糖果一样甜。\n\n- 一起看过的电影\n- 一起走过的街道\n- 一起分享的音乐\n\n**都是我最珍贵的回忆。**' },
+                { short: '💕 心心相印', detail: '不需要太多言语，\n一个眼神就懂。\n\n这就是我们的默契，\n是时间沉淀下来的珍贵礼物。\n\n---\n\n*愿这份心意，永不过期。*' },
+                { short: '🌸 春日与你', detail: '春天因你而更美，\n花开因你而更香。\n\n你是我生命中最绚烂的色彩，\n是我世界里最温暖的光。\n\n**❤️ 爱你**' },
+                { short: '🌟 星空下的约定', detail: '还记得那片星空吗？\n我们许下的约定，\n像星星一样永恒。\n\n无论走到哪里，\n抬头看星星的时候，\n就知道你在想我。' },
+                { short: '💝 小确幸', detail: '生活中的小确幸：\n\n1. 早上醒来看到你的消息\n2. 一起窝在沙发看电影\n3. 手牵手散步\n4. 你做的每一顿饭\n\n**每一个瞬间都值得珍藏。**' },
+                { short: '🎵 心动旋律', detail: '有些歌，\n一听就想起了你。\n\n旋律里有我们的故事，\n歌词里有我们的心情。\n\n*你是我最动听的心跳。*' },
+                { short: '💌 悄悄话', detail: '想对你说的话有很多，\n但最重要的只有一句：\n\n**谢谢你出现在我的生命里。**\n\n有了你，\n每一天都是纪念日。' },
+                { short: '🍀 幸运', detail: '遇见你，\n是我这辈子最幸运的事。\n\n不是偶然，\n是命中注定的安排。\n\n*感恩每一个有你的日子。*' },
+                { short: '🌈 彩虹', detail: '雨后的彩虹，\n像极了我们的爱情——\n\n经历过风雨，\n才更懂得珍惜晴天的美好。\n\n**一起看彩虹吧。**' },
+                // 纯字符串（无detail，不可点击）
+                { short: '💗 爱你哦' },
+                { short: '🥰 每一天' },
+                { short: '💞 心相连' },
+                { short: '🌷 永恒' },
+                { short: '💐 珍贵' },
+            ];
+
+            // ==================== 数据规范化 ====================
+            /**
+             * 将各种格式的数据条目统一为 { short, detail? }
+             * - 纯字符串 -> { short: 字符串, detail: undefined }
+             * - 对象 { short, detail? } -> 保持不变
+             */
+            function normalizeEntry(entry) {
+                if (typeof entry === 'string') {
+                    return { short: entry, detail: undefined };
                 }
+                if (entry && typeof entry === 'object' && typeof entry.short === 'string') {
+                    return {
+                        short: entry.short,
+                        detail: typeof entry.detail === 'string' ? entry.detail : undefined,
+                    };
+                }
+                // 无效数据，返回默认
+                console.warn('无效数据条目，已跳过:', entry);
+                return null;
             }
 
-            // ---------- 2. 数据加载模块 - 支持外部 JSON ----------
-            let messageLibrary = [];
-            let dataLoaded = false;
-            
-            // 加载外部 JSON 文件
-            async function loadMessagesFromJSON() {
+            function normalizeData(rawData) {
+                if (!Array.isArray(rawData)) {
+                    console.warn('数据格式错误：期望数组，收到', typeof rawData);
+                    return [];
+                }
+                return rawData
+                    .map(normalizeEntry)
+                    .filter(entry => entry !== null && entry.short && entry.short.trim().length > 0);
+            }
+
+            // ==================== 随机抽取 ====================
+            function pickRandom(items, count) {
+                if (items.length === 0) return [];
+                const shuffled = [...items];
+                // Fisher-Yates 洗牌
+                for (let i = shuffled.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+                }
+                return shuffled.slice(0, Math.min(count, items.length));
+            }
+
+            // ==================== Markdown 渲染 ====================
+            function renderMarkdown(text) {
+                if (!text || typeof text !== 'string') return '';
                 try {
-                    // 检测是否在本地文件环境
-                    const isLocalFile = window.location.protocol === 'file:';
-                    
-                    if (isLocalFile) {
-                        console.log('本地文件环境，使用内置数据');
-                        // 本地环境直接使用内置数据（避免CORS）
-                        messageLibrary = [
-                            "##理解的开端\n2022/03/11 我们第一次确定能与对方相互理解",
-                            "##第一次牵手\n2022/03/19 有人说手冷要暖一暖",
-                            "##第一次拥抱\n2022/03/26 《她都这么信任我了我怎么能想别的呢》",
-                            "##**The world is so beautiful that I can find a people just like me**",
-                            "##散瞳\n视线完全模糊还帮忙做东西真的是真爱\n嗯，真的是真爱",
-                            "##发酒疯\n2022/10/04 让我们铭记这个伟大却落寞的日子，陛下发酒疯但仍然没有能够勇敢到表白，失望",
-                            "##表白\n2022/10/31 **仿佛波涛汹涌的湖面掉下一颗石头又掀起波澜万丈**",
-                            "##重色轻友\n2022/11/01 给我送书，在楼下聊天把zzc静音\n2026/02/07 聊到一半扔下zzc两个小时",
-                            "##大哥\n大！哥！你那个周三看到的那个女孩，真的是我女朋友哦！",
-                            "##悠哉悠哉，辗转反侧\n这是一首情诗",
-                            "##安心\n你靠着我睡觉的时候慢慢地我也会想睡\n现在新发现是靠着你的时候我也会很舒服想睡",
-                            "##第一次亲\n2023/02/04 “你爱我吗？” “肯定 我爱你”",
-                            "##猜猜币\n没想到吧！地铁单程票！",
-                            "##未来的孩子？\n404 NOT FOUND",
-                            "##哔卟\n哔卟~",
-                            "##缘分\n那你可以选择相信我带来的缘分"
-                        ];
-                        dataLoaded = true;
-                    } else {
-                        // 在线环境使用 fetch
-                        const response = await fetch('messages.json');
-                        if (!response.ok) throw new Error('网络响应失败');
-                        const data = await response.json();
-                        messageLibrary = data.messages;
-                        dataLoaded = true;
-                        console.log('成功加载', messageLibrary.length, '条消息');
+                    if (typeof marked !== 'undefined' && marked.parse) {
+                        return marked.parse(text);
                     }
-                } catch (error) {
-                    console.error('加载失败，使用内置备用数据', error);
-                    // 备用数据
-                    messageLibrary = [
-                        "##理解的开端\n2022/03/11 我们第一次确定能与对方相互理解",
-                        "##第一次牵手\n2022/03/19 有人说手冷要暖一暖",
-                        "##第一次拥抱\n2022/03/26 《她都这么信任我了我怎么能想别的呢》",
-                        "##**The world is so beautiful that I can find a people just like me**",
-                        "##散瞳\n视线完全模糊还帮忙做东西真的是真爱\n嗯，真的是真爱",
-                        "##发酒疯\n2022/10/04 让我们铭记这个伟大却落寞的日子，陛下发酒疯但仍然没有能够勇敢到表白，失望",
-                        "##表白\n2022/10/31 **仿佛波涛汹涌的湖面掉下一颗石头又掀起波澜万丈**",
-                        "##重色轻友\n2022/11/01 给我送书，在楼下聊天把zzc静音\n2026/02/07 聊到一半扔下zzc两个小时",
-                        "##大哥\n大！哥！你那个周三看到的那个女孩，真的是我女朋友哦！",
-                        "##悠哉悠哉，辗转反侧\n这是一首情诗",
-                        "##安心\n你靠着我睡觉的时候慢慢地我也会想睡\n现在新发现是靠着你的时候我也会很舒服想睡",
-                        "##第一次亲\n2023/02/04 “你爱我吗？” “肯定 我爱你”",
-                        "##猜猜币\n没想到吧！地铁单程票！",
-                        "##未来的孩子？\n404 NOT FOUND",
-                        "##哔卟\n哔卟~",
-                        "##缘分\n那你可以选择相信我带来的缘分"
-                    ];
-                    dataLoaded = true;
+                } catch (e) {
+                    console.warn('marked.js 渲染失败，使用纯文本:', e);
+                }
+                // Fallback：简单转义HTML并保留换行
+                return text
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/\n/g, '<br>');
+            }
+
+            // ==================== 图片加载错误处理 ====================
+            function handleImageError() {
+                console.warn('主图片加载失败，使用占位符');
+                if (mainImage) {
+                    mainImage.style.display = 'none';
+                }
+                if (imagePlaceholder) {
+                    imagePlaceholder.style.display = 'flex';
                 }
             }
 
-            // 获取随机五条消息
-            function getRandomFive() {
-                if (!dataLoaded || messageLibrary.length === 0) {
-                    console.warn('消息库未就绪，使用默认消息');
-                    return ["💕 加载中...", "💕 请稍候", "💕 即将出现", "💕 爱的寄语", "💕 纪念日快乐"];
-                }
-                const shuffled = [...messageLibrary].sort(() => Math.random() - 0.5);
-                return shuffled.slice(0, 5);
+            // 暴露到全局作用域（onerror属性需要）
+            window.handleImageError = handleImageError;
+
+            // ==================== 爱心飘落 ====================
+            function createFallingHeart() {
+                const heart = document.createElement('span');
+                heart.classList.add('falling-heart');
+                // 随机选择爱心emoji
+                const heartEmojis = ['❤️', '💕', '💗', '💖', '💝', '💘', '🌸', '🩷', '💓', '💞', '🫶', '✨'];
+                heart.textContent = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+
+                // 随机参数
+                const size = Math.random() * 22 + 14; // 14-36px
+                const leftPos = Math.random() * 94 + 3; // 3%-97%
+                const duration = Math.random() * 6 + 4; // 4-10秒
+                const delay = Math.random() * 5; // 0-5秒延迟
+                const opacity = Math.random() * 0.5 + 0.35; // 0.35-0.85
+
+                heart.style.cssText = `
+                    font-size: ${size}px;
+                    left: ${leftPos}%;
+                    animation-duration: ${duration}s;
+                    animation-delay: ${delay}s;
+                    opacity: ${opacity};
+                `;
+
+                heartsLayer.appendChild(heart);
+
+                // 动画结束后移除并创建新的
+                const totalDuration = (duration + delay) * 1000;
+                setTimeout(() => {
+                    if (heart.parentNode) {
+                        heart.remove();
+                    }
+                    // 补充新爱心
+                    createFallingHeart();
+                }, totalDuration + 200);
             }
 
-            // ---------- 3. 图片错误处理 ----------
-            document.getElementById('mainImage').onerror = function() {
-                console.warn('图片加载失败，请检查路径 picture/MainPic.jpeg');
-                this.src = 'data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22400%22%20viewBox%3D%220%200%20400%20400%22%3E%3Crect%20width%3D%22400%22%20height%3D%22400%22%20fill%3D%22%23ffd9e5%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%20fill%3D%22%23b3405c%22%20font-size%3D%2220%22%3E💗%20纪念日%20💗%3C%2Ftext%3E%3C%2Fsvg%3E';
-            };
-
-            // ---------- 4. 获取DOM元素 ----------
-            const wrapper = document.getElementById('imageWrapper');
-            const orbit = document.getElementById('orbitContainer');
-            const tip = document.getElementById('statusTip');
-
-            // 确保初始是全屏模式
-            wrapper.classList.remove('final-state');
-            wrapper.classList.add('initial-full');
-
-            // ---------- 5. 椭圆轨道定位函数 ----------
-            function repositionBubbles() {
-                const frame = document.querySelector('.frame');
-                if (!frame) return;
-                
-                const frameRect = frame.getBoundingClientRect();
-                const centerX = frameRect.width / 2;
-                const centerY = frameRect.height / 2;
-                
-                // 椭圆轨道参数：水平半径较大，垂直半径较小
-                const radiusX = frameRect.width * 0.4;  // 水平轴
-                const radiusY = frameRect.height * 0.2; // 垂直轴
-                
-                const bubbles = document.querySelectorAll('.bubble');
-                if (bubbles.length === 0) return;
-                
-                const angleStep = (2 * Math.PI) / bubbles.length;
-                
-                // 使用时间控制旋转速度 (每 20 秒一圈)
-                const startAngle = (performance.now() / 20000) * 2 * Math.PI;
-                
-                bubbles.forEach((bubble, idx) => {
-                    const angle = startAngle + idx * angleStep;
-                    
-                    // 椭圆轨迹上的坐标
-                    const bubbleCenterX = centerX + radiusX * Math.cos(angle);
-                    const bubbleCenterY = centerY + radiusY * Math.sin(angle);
-                    
-                    // 获取气泡宽高
-                    const w = bubble.offsetWidth;
-                    const h = bubble.offsetHeight;
-                    
-                    if (w === 0 || h === 0) {
-                        bubble.style.left = (bubbleCenterX - 60) + 'px';
-                        bubble.style.top = (bubbleCenterY - 40) + 'px';
-                    } else {
-                        bubble.style.left = (bubbleCenterX - w/2) + 'px';
-                        bubble.style.top = (bubbleCenterY - h/2) + 'px';
+            function initHearts() {
+                // 初始创建一批爱心，错开延迟
+                const initialCount = 20;
+                for (let i = 0; i < initialCount; i++) {
+                    setTimeout(() => {
+                        createFallingHeart();
+                    }, i * 250);
+                }
+                // 持续补充
+                setInterval(() => {
+                    const currentHearts = heartsLayer.querySelectorAll('.falling-heart').length;
+                    if (currentHearts < 25) {
+                        createFallingHeart();
                     }
-                    
-                    // 根据 Y 坐标判断前后遮挡关系
-                    // 当气泡在椭圆下半部分 (sin(angle) > 0) 时在前，上半部分在后
-                    // 主图片 z-index:20 位于中间层
-                    if (Math.sin(angle) > 0) {
-                        bubble.classList.add('front');
-                        bubble.classList.remove('behind');
-                    } else {
-                        bubble.classList.add('behind');
-                        bubble.classList.remove('front');
+                }, 1500);
+            }
+
+            // ==================== 气泡与轨道 ====================
+            let bubbles = []; // { element, data, angle }
+            let orbitAnimationId = null;
+            let orbitCenterX = 0;
+            let orbitCenterY = 0;
+            let orbitRadiusX = 0; // 椭圆水平半轴
+            let orbitRadiusY = 0; // 椭圆垂直半轴
+            const ORBIT_SPEED = 0.004; // 每帧旋转弧度（约0.23度/帧，60fps下约14度/秒，一圈约26秒）
+            const BUBBLE_COUNT = 5;
+
+            function updateOrbitParams() {
+                const wrapperRect = mainImageWrapper.getBoundingClientRect();
+                orbitCenterX = wrapperRect.left + wrapperRect.width / 2;
+                orbitCenterY = wrapperRect.top + wrapperRect.height / 2;
+
+                // 椭圆半轴：图片尺寸的0.75倍 + 气泡预估半径
+                const avgBubbleSize = 55; // 气泡平均半径估算
+                orbitRadiusX = wrapperRect.width * 0.72 + avgBubbleSize;
+                orbitRadiusY = wrapperRect.height * 0.58 + avgBubbleSize;
+
+                // 确保最小轨道尺寸
+                orbitRadiusX = Math.max(orbitRadiusX, 120);
+                orbitRadiusY = Math.max(orbitRadiusY, 85);
+            }
+
+            function createBubbleElement(item, index) {
+                const el = document.createElement('div');
+                el.classList.add('bubble');
+                if (item.detail) {
+                    el.classList.add('clickable');
+                    el.setAttribute('data-has-detail', 'true');
+                }
+                el.setAttribute('data-index', index);
+
+                // 渲染短文本的Markdown
+                const renderedShort = renderMarkdown(item.short);
+                const textSpan = document.createElement('span');
+                textSpan.classList.add('bubble-text');
+                textSpan.innerHTML = renderedShort;
+                el.appendChild(textSpan);
+
+                // 点击事件
+                if (item.detail) {
+                    el.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        openDetailModal(item.detail);
+                    });
+                    // 触摸事件防止延迟
+                    el.addEventListener('touchend', (e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        openDetailModal(item.detail);
+                    });
+                }
+
+                // 初始隐藏（开场动画结束后显示）
+                el.style.opacity = '0';
+                el.style.transition = 'opacity 0.6s ease';
+
+                scene.appendChild(el);
+                return el;
+            }
+
+            function positionBubbleOnOrbit(el, angle) {
+                const x = orbitCenterX + orbitRadiusX * Math.cos(angle);
+                const y = orbitCenterY + orbitRadiusY * Math.sin(angle);
+
+                // 使用transform定位（相对于scene，因为scene是fixed且inset:0）
+                // 需要转换为相对于视口的坐标
+                el.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`;
+
+                // z-index：下半部分在前面，上半部分在后面
+                const isBelowCenter = y > orbitCenterY;
+                el.style.zIndex = isBelowCenter ? '15' : '5';
+            }
+
+            function startOrbitAnimation() {
+                updateOrbitParams();
+
+                function animate() {
+                    updateOrbitParams();
+
+                    for (let i = 0; i < bubbles.length; i++) {
+                        bubbles[i].angle += ORBIT_SPEED;
+                        // 保持角度在0-2π范围内
+                        if (bubbles[i].angle > Math.PI * 2) {
+                            bubbles[i].angle -= Math.PI * 2;
+                        }
+                        positionBubbleOnOrbit(bubbles[i].element, bubbles[i].angle);
                     }
+
+                    orbitAnimationId = requestAnimationFrame(animate);
+                }
+
+                orbitAnimationId = requestAnimationFrame(animate);
+            }
+
+            function stopOrbitAnimation() {
+                if (orbitAnimationId) {
+                    cancelAnimationFrame(orbitAnimationId);
+                    orbitAnimationId = null;
+                }
+            }
+
+            function showBubbles() {
+                bubbles.forEach(b => {
+                    b.element.style.opacity = '1';
                 });
             }
 
-            // ---------- 6. 动画循环 ----------
-            let animationFrame;
-            function startOrbitAnimation() {
-                function animate() {
-                    repositionBubbles();
-                    animationFrame = requestAnimationFrame(animate);
-                }
-                animationFrame = requestAnimationFrame(animate);
+            function clearBubbles() {
+                stopOrbitAnimation();
+                bubbles.forEach(b => {
+                    if (b.element && b.element.parentNode) {
+                        b.element.remove();
+                    }
+                });
+                bubbles = [];
             }
 
-            // ---------- 7. 初始化气泡 (等待数据加载后) ----------
-            const loadPromise = loadMessagesFromJSON();
-            
-            async function initializeBubbles() {
-                await loadPromise; // 等待 JSON 加载完成
-                
-                const randomTexts = getRandomFive();
-                
-                // 清空 orbit
-                orbit.innerHTML = '';
-                
-                // 创建五个气泡
-                for (let i = 0; i < 5; i++) {
-                    const bubble = document.createElement('div');
-                    bubble.className = 'bubble';
-                    
-                    const rawMarkdown = randomTexts[i] || "💕 纪念日快乐";
-                    
-                    let htmlContent = '';
-                    try {
-                        htmlContent = marked.parse(rawMarkdown);
-                    } catch (e) {
-                        htmlContent = `<p>${rawMarkdown}</p>`;
-                    }
-                    bubble.innerHTML = `<div class="markdown-content">${htmlContent}</div>`;
-                    orbit.appendChild(bubble);
+            function initBubbles(dataItems) {
+                clearBubbles();
+
+                const selected = pickRandom(dataItems, BUBBLE_COUNT);
+                if (selected.length === 0) {
+                    console.warn('没有可用数据来创建气泡');
+                    return;
                 }
-                
+
+                // 均匀分布初始角度
+                const angleStep = (Math.PI * 2) / selected.length;
+                const startOffset = -Math.PI / 2; // 从顶部开始
+
+                selected.forEach((item, i) => {
+                    const el = createBubbleElement(item, i);
+                    const angle = startOffset + i * angleStep;
+                    bubbles.push({
+                        element: el,
+                        data: item,
+                        angle: angle,
+                    });
+                });
+
                 // 初始定位
-                repositionBubbles();
-                
-                // 启动动画循环
+                updateOrbitParams();
+                bubbles.forEach(b => {
+                    positionBubbleOnOrbit(b.element, b.angle);
+                });
+
                 startOrbitAnimation();
             }
 
-            // 执行初始化
-            initializeBubbles();
+            // ==================== 详情弹窗 ====================
+            function openDetailModal(detailText) {
+                if (!detailText || typeof detailText !== 'string') return;
 
-            // ---------- 8. 窗口大小改变时重新计算位置 ----------
-            window.addEventListener('resize', () => {
-                repositionBubbles();
+                const rendered = renderMarkdown(detailText);
+                modalDetailContent.innerHTML = rendered;
+                modalScroll.scrollTop = 0;
+                modalOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeDetailModal() {
+                modalOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+                // 延迟清空内容，保留过渡效果
+                setTimeout(() => {
+                    modalDetailContent.innerHTML = '';
+                }, 350);
+            }
+
+            // 关闭按钮
+            modalCloseBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                closeDetailModal();
             });
 
-            // ---------- 9. 清理动画 ----------
-            window.addEventListener('beforeunload', function() {
-                if (animationFrame) {
-                    cancelAnimationFrame(animationFrame);
+            // 点击遮罩关闭
+            modalOverlay.addEventListener('click', (e) => {
+                if (e.target === modalOverlay) {
+                    closeDetailModal();
                 }
             });
 
-            // ---------- 10. 缩小动画 ----------
-            setTimeout(() => {
-                wrapper.classList.remove('initial-full');
-                wrapper.classList.add('final-state');
-                tip.innerText = '💖 爱心飘落 · 卫星环绕 💖';
-                tip.style.opacity = '0.8';
-            }, 800);
+            // 阻止弹窗卡片点击冒泡
+            modalCard.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
 
-            // ---------- 11. 创建飘落爱心 ----------
-            // 确保 DOM 加载完成后再创建爱心
+            // ESC关闭
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modalOverlay.classList.contains('active')) {
+                    closeDetailModal();
+                }
+            });
+
+            // ==================== 开场动画 ====================
+            function startIntroAnimation() {
+                // 图片初始状态：全屏（initial类）
+                // 延迟一帧后切换到shrunk类触发缩小动画
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        mainImageWrapper.classList.remove('initial');
+                        mainImageWrapper.classList.add('shrunk');
+                    });
+                });
+
+                // 缩小动画持续约1.6秒，之后显示气泡
+                const bubbleAppearDelay = 1700; // 略长于CSS transition时间
+                setTimeout(() => {
+                    showBubbles();
+                }, bubbleAppearDelay);
+            }
+
+            // ==================== 窗口大小调整 ====================
+            let resizeDebounceTimer = null;
+
+            function handleResize() {
+                clearTimeout(resizeDebounceTimer);
+                resizeDebounceTimer = setTimeout(() => {
+                    updateOrbitParams();
+                    // 重新定位所有气泡
+                    if (bubbles.length > 0) {
+                        bubbles.forEach(b => {
+                            positionBubbleOnOrbit(b.element, b.angle);
+                        });
+                    }
+                }, 200);
+            }
+
+            window.addEventListener('resize', handleResize);
+            window.addEventListener('orientationchange', () => {
+                setTimeout(handleResize, 400);
+            });
+
+            // ==================== 数据加载 ====================
+            async function loadMessages() {
+                const isFileProtocol = window.location.protocol === 'file:';
+
+                if (isFileProtocol) {
+                    console.log('📁 检测到 file:// 协议，使用内置备用数据');
+                    return normalizeData(FALLBACK_MESSAGES);
+                }
+
+                // 在线环境：尝试fetch外部JSON
+                try {
+                    console.log('🌐 尝试加载 messages.json...');
+                    const response = await fetch('messages.json', {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                        },
+                        // 超时处理
+                        signal: AbortSignal.timeout ? AbortSignal.timeout(5000) : undefined,
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+
+                    const rawData = await response.json();
+                    const normalized = normalizeData(rawData);
+
+                    if (normalized.length === 0) {
+                        throw new Error('messages.json 中无有效数据');
+                    }
+
+                    console.log(`✅ 成功加载 ${normalized.length} 条外部数据`);
+                    return normalized;
+                } catch (err) {
+                    console.warn('⚠️ 加载 messages.json 失败，使用内置备用数据:', err.message);
+                    return normalizeData(FALLBACK_MESSAGES);
+                }
+            }
+
+            // ==================== 初始化流程 ====================
+            async function init() {
+                console.log('🚀 初始化开始...');
+
+                // 1. 启动爱心飘落（视觉氛围先行）
+                initHearts();
+
+                // 2. 加载数据
+                const messages = await loadMessages();
+                console.log(`📋 可用数据: ${messages.length} 条`);
+
+                // 3. 初始化气泡（暂不显示）
+                initBubbles(messages);
+
+                // 4. 启动开场动画（图片缩小 + 延迟显示气泡）
+                // 短暂延迟确保布局计算完成
+                setTimeout(() => {
+                    startIntroAnimation();
+                }, 300);
+
+                console.log('✨ 初始化完成！');
+            }
+
+            // ==================== 启动应用 ====================
+            // 等待DOM和资源就绪
             if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', createHearts);
+                document.addEventListener('DOMContentLoaded', init);
             } else {
-                createHearts();
+                init();
+            }
+
+            // ==================== 页面卸载清理 ====================
+            window.addEventListener('beforeunload', () => {
+                stopOrbitAnimation();
+            });
+
+            // ==================== 暴露调试接口 ====================
+            if (typeof window !== 'undefined') {
+                window.__lovePage = {
+                    version: APP_VERSION,
+                    bubbles,
+                    messages: FALLBACK_MESSAGES,
+                    resetAnimation: () => {
+                        mainImageWrapper.classList.add('initial');
+                        mainImageWrapper.classList.remove('shrunk');
+                        bubbles.forEach(b => { b.element.style.opacity = '0'; });
+                        setTimeout(() => startIntroAnimation(), 300);
+                    },
+                    reloadData: async () => {
+                        const messages = await loadMessages();
+                        initBubbles(messages);
+                        showBubbles();
+                        console.log('🔄 数据已重新加载');
+                    },
+                };
+                console.log('💡 调试接口已挂载到 window.__lovePage');
             }
         })();
     </script>
-
-    <!-- ========== 部署说明 ========== -->
-    <!-- 
-        文件结构要求：
-        ├── index.html          (本文件)
-        ├── messages.json       (可选，外部文本库，格式见下)
-        └── picture/
-            └── MainPic.jpeg     (纪念图片，正方形推荐)
-
-        messages.json 格式示例：
-        {
-            "messages": [
-                "##标题\n内容支持 *Markdown*",
-                "##第二条\n多行内容",
-                ...
-            ]
-        }
-
-        GitHub Pages 部署步骤：
-        1. 在 GitHub 新建仓库（如 love-orbit）
-        2. 上传所有文件到仓库根目录
-        3. 仓库 Settings -> Pages -> 选择 main 分支，根目录，保存
-        4. 等待几分钟，访问 https://<用户名>.github.io/<仓库名>/
-        
-        说明：
-        - 本地开发时自动使用内置数据（避免 CORS 问题）
-        - 部署到 GitHub Pages 时会自动加载同目录下的 messages.json
-        - 如需自定义图片，请将图片放在 picture/MainPic.jpeg
-        - 爱心飘落效果会自动运行，营造浪漫氛围
-    -->
 </body>
 </html>
