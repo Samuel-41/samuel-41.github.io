@@ -355,7 +355,7 @@
         }
 
         .bubble.clickable:active {
-            transform: scale(0.8) !important;
+            transform: translate(-50%, -50%) scale(0.8) !important;
             box-shadow: 0 1px 8px rgba(251, 111, 146, 0.45);
             transition: transform 0.1s ease, box-shadow 0.1s ease;
         }
@@ -862,7 +862,9 @@
                 const x = orbitCenterX + orbitRadiusX * Math.cos(angle);
                 const y = orbitCenterY + orbitRadiusY * Math.sin(angle);
 
-                el.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`;
+                el.style.left = x + 'px';
+                el.style.top = y + 'px';
+                el.style.transform = 'translate(-50%, -50%)';
 
                 const isBelowCenter = y > orbitCenterY;
                 el.style.zIndex = isBelowCenter ? '15' : '5';
